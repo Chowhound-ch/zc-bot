@@ -7,6 +7,7 @@ import love.forte.simbot.event.GroupMessageEvent
 import org.springframework.core.annotation.AliasFor
 import per.zsck.simbot.common.enums.RobotPermission
 import per.zsck.simbot.core.permit.Permit
+import per.zsck.simbot.core.state.GroupStateEnum
 
 /**
  * @author wuyou
@@ -39,6 +40,6 @@ annotation class RobotListen(
     /**
      * 是否在当前群开机的时候执行,仅当监听类型是[GroupMessageEvent]时有效
      */
-    val isBoot: Boolean = true,
+    val stateLeast: GroupStateEnum = GroupStateEnum.NORMAL,
 
     )

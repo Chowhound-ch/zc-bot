@@ -34,4 +34,12 @@ class GroupStateCache(
         }
     }
 
+    fun getGroupsWithState(stateEnum: GroupStateEnum): MutableList<String>{
+        return ArrayList<String>().apply {
+            STATE_MAP.forEach{
+                if (it.value == stateEnum){ this.add(it.key) }
+            }
+        }
+    }
+
 }

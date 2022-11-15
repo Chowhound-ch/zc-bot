@@ -1,5 +1,6 @@
 package per.zsck.simbot.core.state.listener
 
+import cn.hutool.core.util.EnumUtil
 import love.forte.simboot.annotation.Filter
 import love.forte.simboot.annotation.FilterValue
 import love.forte.simbot.PriorityConstant
@@ -22,10 +23,10 @@ import per.zsck.simbot.core.state.service.GroupStateService
 class GroupStateListener(
     val groupStateService: GroupStateService,
 ){
-    @RobotListen(isBoot = false, permission = Permit.MANAGER, priority = PriorityConstant.FIRST)
-    @Filter("/{{desState,(开机|关机)}}")
-    suspend fun GroupMessageEvent.setGroupState(@FilterValue("desState")desState: String): EventResult{
-        val desEnum = if (desState == "开机") { GroupStateEnum.OPENED }else{ GroupStateEnum.CLOSED }
+    @RobotListen(stateLeast = GroupStateEnum.CLOSED, permission = Permit.MANAGER, priority = PriorityConstant.FIRST)
+    @Filter("/开机状态{{desState,[0-2]}}")
+    suspend fun GroupMessageEvent.setGroupState(@FilterValue("desState")desState: Int): EventResult{
+        val desEnum = GroupStateEnum.getInstance(desState)
         val groupNumber = groupNumber()
 
         if (groupStateService.setGroupState(groupNumber, desEnum)) {

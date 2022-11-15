@@ -32,3 +32,6 @@ build/
 *.json
 *.bot
 application-*.yml
+.mvn/
+cache/
+logs/

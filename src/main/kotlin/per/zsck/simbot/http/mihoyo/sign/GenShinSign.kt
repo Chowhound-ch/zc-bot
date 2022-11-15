@@ -40,6 +40,9 @@ class GenShinSign(
     fun init(){
         val genshinInfo = genshinInfoService.getGenshinInfo(defaultUid)
 
+        doSign(genshinInfo)
+
+
         if (genshinInfo == null ){
             logError("默认账号[uid:{}]不存在，无法更新奖励列表", defaultUid)
         }else{
@@ -129,7 +132,7 @@ class GenShinSign(
         if (listInfoResult.get("message").asText().equals( "OK" )){
 
             val awards = listInfoResult.get("data")?.get("awards")?.toList()?.stream()!!
-                .map { award -> objectMapper.readValue(award.toString(), Award::class.java)  }.toList()
+                .map { award -> objectMapper.readValue(award.toString(), Award::class.java)  }.toList()//TODO
             if (awards.isNotEmpty()){
                 this.awards = awards
                 return true
@@ -159,7 +162,7 @@ class GenShinSign(
 
         } else {
             logWarn("cookie错误,ret_code: {}, res: {}", retcode, result.get("message").asText())
-            throw GenShinCookieException("你还没有登陆米游社哦，这个cookie是无效的")
+           // throw GenShinCookieException("你还没有登陆米游社哦，这个cookie是无效的")
         }
     }
 

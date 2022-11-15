@@ -1,6 +1,8 @@
 package per.zsck.simbot.core
 
 import kotlinx.coroutines.runBlocking
+import love.forte.simbot.ID
+import love.forte.simbot.action.sendIfSupport
 import love.forte.simbot.event.Event
 import love.forte.simbot.event.GroupMessageEvent
 import org.aspectj.lang.ProceedingJoinPoint
@@ -9,6 +11,7 @@ import org.aspectj.lang.annotation.Aspect
 import org.springframework.stereotype.Component
 import per.zsck.simbot.common.annotation.RobotListen
 import per.zsck.simbot.common.logInfo
+import per.zsck.simbot.core.config.MiraiBotManagerSupport
 import per.zsck.simbot.core.permit.Permit
 import per.zsck.simbot.core.permit.service.PermitDetailService
 import per.zsck.simbot.core.state.GroupStateCache
@@ -21,8 +24,9 @@ import per.zsck.simbot.core.state.GroupStateEnum
 @Aspect
 @Component
 class MessageAspect(
-    val permitDetailService: PermitDetailService
-    ) {
+    val permitDetailService: PermitDetailService,
+    ): MiraiBotManagerSupport() {
+
 
     @Around("@annotation(per.zsck.simbot.common.annotation.RobotListen) && @annotation(annotation))")
     fun ProceedingJoinPoint.doAroundAdvice(annotation: RobotListen): Any? {
@@ -38,7 +42,10 @@ class MessageAspect(
 
         fun proceedFailed(tip: String, group: String) {
             logInfo("执行监听器{}({})(群: {}) 失败 : {}", signature.name, annotation.desc, group, tip)
+            runBlocking { miraiBotManager.all().first().group(group.ID)?.sendIfSupport(tip) }
+
         }
+
 
         if (event is GroupMessageEvent) {
             val group = runBlocking { event.group() }
@@ -54,8 +61,8 @@ class MessageAspect(
 
             }
             // 判断是否开机
-            if (annotation.isBoot && GroupStateCache.STATE_MAP.getOrDefault(group.id.toString(), GroupStateEnum.CLOSED) == GroupStateEnum.CLOSED) {
-                return proceedFailed("当前群未开机", group.id.toString())
+            if (GroupStateCache.STATE_MAP.getOrDefault(group.id.toString(), GroupStateEnum.CLOSED) < annotation.stateLeast) {
+                return proceedFailed("当前群未开放此功能", group.id.toString())
             }
 
             return proceedSuccess(group.id.toString())

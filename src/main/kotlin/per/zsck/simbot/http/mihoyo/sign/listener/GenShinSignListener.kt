@@ -15,7 +15,6 @@ import net.mamoe.mirai.message.data.RawForwardMessage
 import org.springframework.stereotype.Component
 import per.zsck.simbot.common.annotation.RobotListen
 import per.zsck.simbot.common.logInfo
-import per.zsck.simbot.common.utils.MessageUtil.qqNumber
 import per.zsck.simbot.http.mihoyo.sign.GenShinSign
 import per.zsck.simbot.http.mihoyo.sign.entity.GenshinInfo
 import per.zsck.simbot.http.mihoyo.sign.service.GenshinInfoService
@@ -35,14 +34,14 @@ class GenShinSignListener(
     @RobotListen
     @Filter("/签到")
     suspend fun GroupMessageEvent.genshinSign(){
-        val qqNumber = qqNumber()
+        val author = author()
 
         MiraiForwardMessageBuilder().apply {
-            genshinInfoService.getGenshinInfoList(qqNumber).onEach {
+            genshinInfoService.getGenshinInfoList(author.id.toString()).onEach {
 
                 val numberOfSign = genShinSign.doSignWithAward(it)
 
-                this.add(author().id, "米游社签到", Timestamp.now(), genShinSign.getResMsg(it, numberOfSign) )
+                this.add(author.id, "米游社签到", Timestamp.now(), genShinSign.getResMsg(it, numberOfSign) )
 
             }
 
@@ -58,7 +57,6 @@ class GenShinSignListener(
     suspend fun GroupMessageEvent.bindGenshin(sessionContext: ContinuousSessionContext ): EventResult{
 
         val author = author()
-        val qqNumber = qqNumber()
 
         sendIfSupport( buildMessages {
             + At(author.id)
@@ -114,9 +112,9 @@ class GenShinSignListener(
                 }
             }
 
-            if (genshinInfoService.saveGenshinInfo(desInfo, qqNumber)){
+            if (genshinInfoService.saveGenshinInfo(desInfo, author.id.toString())){
 
-                logInfo("用户[{}] 与原神账号[uid: {}]成功绑定", qqNumber, desInfo.uid)
+                logInfo("用户[{}] 与原神账号[uid: {}]成功绑定", author.id, desInfo.uid)
                 author.sendIfSupport("成功绑定原神账号\n uid: ${desInfo.uid}\n 昵称: ${desInfo.nickName}")
 
             }
@@ -133,14 +131,13 @@ class GenShinSignListener(
     @Filter("/解绑原神账号")
     suspend fun GroupMessageEvent.unbindGenshin(sessionContext: ContinuousSessionContext ): EventResult{
         val author = author()
-        val qqNumber = qqNumber()
 
         sendIfSupport( buildMessages {
             + At(author.id)
             + "请在私聊中完成后续操作"
         })
 
-        val genshinInfoList = genshinInfoService.getGenshinInfoList(qqNumber)
+        val genshinInfoList = genshinInfoService.getGenshinInfoList(author.id.toString())
 
         if (genshinInfoList.isNotEmpty()){
 
@@ -175,7 +172,7 @@ class GenShinSignListener(
             if ( genshinInfoService.removeGenshinInfo(desUid) ){
                 author.sendIfSupport("成功于账号 uid: $desUid 解除绑定")
 
-                logInfo("用户[{}] 与原神账号[uid: {}]解除绑定", qqNumber, desUid)
+                logInfo("用户[{}] 与原神账号[uid: {}]解除绑定", author.id.toString(), desUid)
             }
 
         }else{

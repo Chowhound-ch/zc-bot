@@ -1,5 +1,6 @@
 package per.zsck.simbot.common.utils
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.http.Header

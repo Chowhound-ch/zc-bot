@@ -14,8 +14,5 @@ object MessageUtil {
     suspend fun GroupEvent.groupNumber(): String {
         return group().id.toString()
     }
-    suspend fun MessageEvent.qqNumber(): String {
-        return source().id.toString()
-    }
 
 }

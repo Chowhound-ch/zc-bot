@@ -2,6 +2,8 @@ package per.zsck.simbot.http.mihoyo.sign.utils
 
 import org.apache.http.Header
 import org.apache.http.message.BasicHeader
+import per.zsck.simbot.http.mihoyo.sign.HeaderParams
+import per.zsck.simbot.http.mihoyo.sign.SignConstant
 import java.util.*
 
 /**
@@ -33,10 +35,24 @@ object HeadersUtil {
     }
 
     fun getBasicHeaders(cookie: String): Array<Header> {
-        return Builder.build()
+        return Builder.add("Cookie", cookie)
+            .add("User-Agent", String.format("Mozilla/5.0 (iPhone; CPU iPhone OS 14_0_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) miHoYoBBS/%s", SignConstant.APP_VERSION))
+            .add("Referer", SignConstant.REFERER_URL)
+            .add("Accept-Encoding", "gzip, deflate, br")
+            .add("x-rpc-channel", "appstore")
+            .add("accept-language", "zh-CN,zh;q=0.9,ja-JP;q=0.8,ja;q=0.7,en-US;q=0.6,en;q=0.5")
+            .add("accept-encoding", "gzip, deflate")
+            .add("accept-encoding", "gzip, deflate")
+            .add("x-requested-with", "com.mihoyo.hyperion")
+            .add("Host", "api-takumi.mihoyo.com").build()
     }
 
     fun getHeaders(cookie: String): Array<Header> {
-        return Builder.build()
+        return Builder.add("x-rpc-device_id", UUID.randomUUID().toString().replace("-", "").toUpperCase())
+            .add("Content-Type", "application/json;charset=UTF-8")
+            .add("x-rpc-client_type", "2")
+            .add("x-rpc-app_version", "2.34.1")
+            .add("DS", HeaderParams.getDS())
+            .addAll(getBasicHeaders(cookie)).build()
     }
 }
