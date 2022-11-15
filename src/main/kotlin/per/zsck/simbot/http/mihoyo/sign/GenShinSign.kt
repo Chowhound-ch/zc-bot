@@ -40,9 +40,6 @@ class GenShinSign(
     fun init(){
         val genshinInfo = genshinInfoService.getGenshinInfo(defaultUid)
 
-        doSign(genshinInfo)
-
-
         if (genshinInfo == null ){
             logError("默认账号[uid:{}]不存在，无法更新奖励列表", defaultUid)
         }else{

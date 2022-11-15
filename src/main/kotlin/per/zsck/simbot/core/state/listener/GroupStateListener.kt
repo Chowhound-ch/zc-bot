@@ -1,6 +1,5 @@
 package per.zsck.simbot.core.state.listener
 
-import cn.hutool.core.util.EnumUtil
 import love.forte.simboot.annotation.Filter
 import love.forte.simboot.annotation.FilterValue
 import love.forte.simbot.PriorityConstant
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Component
 import per.zsck.simbot.common.annotation.RobotListen
 import per.zsck.simbot.common.utils.MessageUtil.groupNumber
 import per.zsck.simbot.core.permit.Permit
+import per.zsck.simbot.core.state.GroupStateCache
 import per.zsck.simbot.core.state.GroupStateEnum
 import per.zsck.simbot.core.state.service.GroupStateService
 
@@ -21,7 +21,7 @@ import per.zsck.simbot.core.state.service.GroupStateService
  */
 @Component
 class GroupStateListener(
-    val groupStateService: GroupStateService,
+    val groupStateService: GroupStateService
 ){
     @RobotListen(stateLeast = GroupStateEnum.CLOSED, permission = Permit.MANAGER, priority = PriorityConstant.FIRST)
     @Filter("/开机状态{{desState,[0-2]}}")
@@ -29,7 +29,8 @@ class GroupStateListener(
         val desEnum = GroupStateEnum.getInstance(desState)
         val groupNumber = groupNumber()
 
-        if (groupStateService.setGroupState(groupNumber, desEnum)) {
+        if (groupStateService.setGroupStateAndCache(groupNumber, desEnum)) {
+
             sendIfSupport("成功将群${groupNumber}设置为${desEnum}")
         }else{
             sendIfSupport("设置失败,群${groupNumber},已是${desEnum}状态")

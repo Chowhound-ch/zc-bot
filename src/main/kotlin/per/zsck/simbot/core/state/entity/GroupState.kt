@@ -11,5 +11,7 @@ data class GroupState(
     var groupNumber: String?,
     var state: GroupStateEnum
 ) {
+    constructor(groupNumber: String, state: GroupStateEnum): this(null, groupNumber, state)
+
     constructor(): this(null, null, GroupStateEnum.CLOSED)
 }
