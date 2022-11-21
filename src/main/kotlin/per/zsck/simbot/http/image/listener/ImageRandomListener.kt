@@ -53,26 +53,4 @@ class ImageRandomListener(
 
         return EventResult.truncate()
     }
-
-    @RobotListen
-    @Filter("/随机cos")
-    suspend fun GroupMessageEvent.randomCos(){
-
-        sendIfSupport( buildMessages {
-            this.image( ByteArrayResource("randomCos", imageRandom.getRandomCos()) )
-        } )
-    }
-
-    @RobotListen
-    @Filter("/买家秀")
-    suspend fun GroupMessageEvent.buyersShow(){
-        sendIfSupport(
-            buildMessages {
-                imageRandom.getBuyersShow().let {
-                    this.append(it["title"].asText())
-                    this.image(ByteArrayResource("buyersShow", imageRandom.getImageBuyUrl( it["pic"].asText() )))
-                }
-            }
-        )
-    }
 }
