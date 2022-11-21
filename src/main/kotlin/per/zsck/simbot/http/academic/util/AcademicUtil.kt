@@ -63,7 +63,7 @@ class AcademicUtil(
                 val start = String.format("%02d", schedule.startTime / 100) + ":" + String.format("%02d", schedule.startTime % 100)
 
                 val end = String.format("%02d", schedule.endTime / 100) + ":" + String.format("%02d", schedule.endTime % 100)
-                builder.append("\n * $start - $end ${mutaleClassmap[schedule.lessonId]} ${schedule.personName}")
+                builder.append("\n * $start - $end ${schedule.room} ${mutaleClassmap[schedule.lessonId]} ${schedule.personName}")
             }
         }
 

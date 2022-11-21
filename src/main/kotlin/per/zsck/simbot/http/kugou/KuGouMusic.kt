@@ -18,11 +18,6 @@ import kotlin.streams.toList
 @Component
 class KuGouMusic: HttpBase() {
 
-    @PostConstruct
-    fun init(){
-        getOneMusicRes("attention")
-      //  objectMapper.readValue("{\"FileName\":\"Blue Stahli - <em>East</em>\"}", Music::class.java)
-    }
 
     fun getMusicUrlByAlbumIDAndHash(music: Music): Music? {
         return getMusicDetail(music.albumID, music.fileHash)?.music

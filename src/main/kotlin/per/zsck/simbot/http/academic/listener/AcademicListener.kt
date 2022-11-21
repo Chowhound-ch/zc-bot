@@ -6,8 +6,15 @@ import love.forte.simboot.annotation.Filter
 import love.forte.simboot.annotation.FilterValue
 import love.forte.simbot.action.sendIfSupport
 import love.forte.simbot.event.FriendMessageEvent
+import love.forte.simbot.event.GroupMessageEvent
+import love.forte.simbot.event.MessageEvent
 import org.springframework.stereotype.Component
 import per.zsck.simbot.common.annotation.RobotListen
+import per.zsck.simbot.common.utils.MessageUtil.groupNumber
+import per.zsck.simbot.core.permit.Permit
+import per.zsck.simbot.core.state.GroupStateConstant
+import per.zsck.simbot.core.state.GroupStateEnum
+import per.zsck.simbot.core.state.service.GroupStateService
 import per.zsck.simbot.http.academic.service.ClassMapService
 import per.zsck.simbot.http.academic.service.ScheduleService
 import per.zsck.simbot.http.academic.util.AcademicUtil
@@ -23,21 +30,22 @@ import java.time.LocalDate
 class AcademicListener(
     val scheduleService: ScheduleService,
     val classMapService: ClassMapService,
-    val academicUtil: AcademicUtil
+    val academicUtil: AcademicUtil,
+    val groupStateService: GroupStateService
 ){
 
-    @RobotListen
-    @Filter("{{index,\\d{1,2}}}")
-    suspend fun FriendMessageEvent.viewWeek(@FilterValue("index")index: Long ){
+    @RobotListen(stateLeast = GroupStateEnum.OPENED_ALL)
+    @Filter("/?{{index,\\d{1,2}}}")
+    suspend fun MessageEvent.viewWeek(@FilterValue("index")index: Long ){
 
         scheduleService.getLessonsByWeek(index).apply {
             academicUtil.getCourseDetailMsg(this).forEach { sendIfSupport(it) }
         }
     }
 
-    @RobotListen
-    @Filter("(w|W){{param,(\\+|-|=)?}}")
-    suspend fun FriendMessageEvent.week(@FilterValue("param")param: String){
+    @RobotListen(stateLeast = GroupStateEnum.OPENED_ALL)
+    @Filter("/?(w|W){{param,(\\+|-|=)?}}")
+    suspend fun MessageEvent.week(@FilterValue("param")param: String){
         val firstDate = scheduleService.getFirstDate()
         val date = Date.valueOf(DateUtil.today())
         val standard = getBalanceByParam(param)
@@ -63,9 +71,9 @@ class AcademicListener(
         }
 
     }
-    @RobotListen
-    @Filter("(d|D){{param,(\\+|-|=)?}}")
-    suspend fun FriendMessageEvent.day(@FilterValue("param")param: String){
+    @RobotListen(stateLeast = GroupStateEnum.OPENED_ALL)
+    @Filter("/?(d|D){{param,(\\+|-|=)?}}")
+    suspend fun MessageEvent.day(@FilterValue("param")param: String){
         val firstDate = scheduleService.getFirstDate()
         val standard = getBalanceByParam(param)
         val date = standard.getDateIfDay()
@@ -85,9 +93,9 @@ class AcademicListener(
             }
         }
     }
-    @RobotListen
-    @Filter("(f|F)\\s*{{name}}")
-    suspend fun FriendMessageEvent.find(@FilterValue("name")name: String){
+    @RobotListen(stateLeast = GroupStateEnum.OPENED_ALL)
+    @Filter("/?(f|F)\\s*{{name}}")
+    suspend fun MessageEvent.find(@FilterValue("name")name: String){
         val classMapList = classMapService.likeClassName(name)
 
         if (classMapList.isEmpty()){
@@ -98,6 +106,19 @@ class AcademicListener(
 
                 sendIfSupport(academicUtil.getLessonInfoMsg(classMap, classDetail))
             }
+        }
+    }
+    @RobotListen(permission = Permit.HOST)
+    @Filter("/{{desState,(开启|关闭)}}课表推送")
+    suspend fun GroupMessageEvent.setAcademicPush(@FilterValue("desState")desStateStr: String){
+        val desState = if (desStateStr == "开启") { GroupStateConstant.LESSON_PUSH } else{ GroupStateConstant.UNABLE_LESSON_PUSH }
+
+        val groupNumber = groupNumber()
+
+        if (groupStateService.setGroupLessonPush(groupNumber, desState)){
+            sendIfSupport("群${groupNumber}成功${desStateStr}课表推送")
+        }else{
+            sendIfSupport("群${groupNumber}的课表推送功能已是${desStateStr}状态")
         }
     }
 

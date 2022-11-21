@@ -5,6 +5,9 @@ import cn.hutool.core.date.DateUtil
 import kotlinx.coroutines.runBlocking
 import love.forte.simbot.ID
 import love.forte.simbot.action.sendIfSupport
+import love.forte.simbot.message.Message
+import love.forte.simbot.message.MessageContent
+import love.forte.simbot.message.Text
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -12,6 +15,9 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import per.zsck.simbot.common.logInfo
 import per.zsck.simbot.core.config.MiraiBotManagerSupport
+import per.zsck.simbot.core.state.GroupStateConstant
+import per.zsck.simbot.core.state.entity.GroupState
+import per.zsck.simbot.core.state.service.GroupStateService
 import per.zsck.simbot.http.academic.entity.Schedule
 import per.zsck.simbot.http.academic.service.ScheduleService
 import per.zsck.simbot.http.academic.util.AcademicUtil
@@ -30,7 +36,8 @@ import javax.annotation.PostConstruct
 @Component
 class TipSchedule  (
     val scheduleService: ScheduleService,
-    val academicUtil: AcademicUtil
+    val academicUtil: AcademicUtil,
+    val groupStateService: GroupStateService
 ): MiraiBotManagerSupport(){
 
     @Value("\${zsck.permit.owner}")
@@ -43,7 +50,6 @@ class TipSchedule  (
         scheduledExecutorService = Executors.newScheduledThreadPool(5)
     }
 
-
     @Scheduled(cron = "0 40 7 * * 1-5")
     @Async
     fun morning() {
@@ -51,11 +57,11 @@ class TipSchedule  (
         val date = DateUtil.date().toSqlDate()
 
         runBlocking {
-            miraiBot.friend(botHost.ID)?.apply {
+            val messageList = buildList{
                 val gap = DateUtil.between(firstDate, date, DateUnit.DAY, true)
 
                 if (date.before(firstDate)) {
-                    sendIfSupport("当前正处于假期，距离开学还有${gap}天")
+                    this.add(Text.of("当前正处于假期，距离开学还有${gap}天"))
                 } else {
 
                     val scheduleList: List<Schedule> = scheduleService.getLessonsByDate(date)
@@ -71,12 +77,17 @@ class TipSchedule  (
                             return@runBlocking
                         }
                     }
-                    sendIfSupport("今日为:${DateUtil.format(date, "MM-dd")} , 第:${(gap / 7 + 1)}周")
+                    this.add(Text.of("今日为:${DateUtil.format(date, "MM-dd")} , 第:${(gap / 7 + 1)}周"))
                     academicUtil.getCourseDetailMsg(scheduleList).forEach {
-                        sendIfSupport(it)
+                        this.add(it)
                     }
                 }
             }
+            miraiBot.friend(botHost.ID)?.apply {
+                messageList.forEach { sendIfSupport( it ) }
+            }
+
+            pushMsgToGroupList(messageList, groupStateService.getGroupListEnableLessonPush(GroupStateConstant.LESSON_PUSH))
         }
 
     }
@@ -96,14 +107,30 @@ class TipSchedule  (
             }
 
             runBlocking {
-                miraiBot.friend(botHost.ID)?.apply {
-                    sendIfSupport("明日为:${ DateUtil.format(date, "MM-dd") }, 第:${(gap / 7 + 1)}周")
+                val messageList = buildList {
+                    this.add(Text.of("明日为:${DateUtil.format(date, "MM-dd")}, 第:${(gap / 7 + 1)}周"))
                     academicUtil.getCourseDetailMsg(scheduleList).forEach {
-                        sendIfSupport(it)
+                        this.add(it)
+                    }
+                }
+                miraiBot.friend(botHost.ID)?.apply {
+                    messageList.forEach { sendIfSupport( it ) }
+                }
+                pushMsgToGroupList(messageList, groupStateService.getGroupListEnableLessonPush(GroupStateConstant.LESSON_PUSH))
+            }
+
+        }
+    }
+
+    fun pushMsgToGroupList(msgList: List<Message>, groupList: List<GroupState>){
+        runBlocking {
+            groupList.forEach { it ->
+                it.groupNumber?.let { groupNumber ->
+                    miraiBot.group(groupNumber.ID)?.apply { //获取每个开启推送的群
+                        msgList.forEach { msg -> sendIfSupport(msg) }//发送推送消息
                     }
                 }
             }
-
         }
     }
 }

@@ -9,9 +9,9 @@ import per.zsck.simbot.core.state.GroupStateEnum
 data class GroupState(
     var id: Long?,
     var groupNumber: String?,
-    var state: GroupStateEnum
+    var state: GroupStateEnum,
+    var lessonPush: Int
 ) {
-    constructor(groupNumber: String, state: GroupStateEnum): this(null, groupNumber, state)
+    constructor(groupNumber: String? = null, state: GroupStateEnum = GroupStateEnum.CLOSED): this(null, groupNumber, state, 0)
 
-    constructor(): this(null, null, GroupStateEnum.CLOSED)
 }

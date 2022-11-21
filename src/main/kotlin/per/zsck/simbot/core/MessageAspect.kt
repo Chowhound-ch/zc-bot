@@ -40,9 +40,12 @@ class MessageAspect(
             return proceed()
         }
 
-        fun proceedFailed(tip: String, group: String) {
-            logInfo("执行监听器{}({})(群: {}) 失败 : {}", signature.name, annotation.desc, group, tip)
-            runBlocking { miraiBotManager.all().first().group(group.ID)?.sendIfSupport(tip) }
+        fun proceedFailed(tip: String? = null, group: String) {
+            logInfo("执行监听器{}({})(群: {}) 失败 : {}", signature.name, annotation.desc, group, tip ?: "无")
+
+            runBlocking { tip?.let {
+                miraiBot.group(group.ID)?.sendIfSupport(it)
+            } }
 
         }
 
@@ -50,6 +53,11 @@ class MessageAspect(
         if (event is GroupMessageEvent) {
             val group = runBlocking { event.group() }
             val author = runBlocking { event.author() }
+
+            if( !event.messageContent.plainText.startsWith("/") ){
+                logInfo("不是以/开头的群聊指令，已自动过滤")
+                return proceedFailed(group = group.id.toString())
+            }
 
 
             // 判断是否有权限

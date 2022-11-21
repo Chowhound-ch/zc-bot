@@ -28,8 +28,7 @@ class SignTask (
         ): MiraiBotManagerSupport(){
 
 
-    @Scheduled(cron = "00 23 18 * * ?")
-//    @Scheduled(cron = "00 00 10 * * ?")
+    @Scheduled(cron = "00 00 10 * * ?")
     fun sign(){
 
         val list = genshinInfoService.list()

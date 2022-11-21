@@ -20,18 +20,26 @@ interface GroupStateService: IService<GroupState>{
     fun getGroupState(group: String): GroupState
 
     fun setGroupStateAndCache(group: String, groupStateEnum: GroupStateEnum): Boolean
+
+    fun getGroupListEnableLessonPush(isPush: Int): MutableList<GroupState>
+
+    fun setGroupLessonPush(group: String, isPush: Int): Boolean
 }
 
 @Service
 class GroupStateServiceImpl: GroupStateService, ServiceImpl<GroupStateMapper, GroupState>(), ApplicationRunner {
     lateinit var groupStateCache: GroupStateCache
 
+
+
     override fun getGroupState(group: String): GroupState {
         return getOne(
             KtQueryWrapper(GroupState::class.java).apply {
                 this.eq(GroupState::groupNumber, group)
             }
-        )
+        ) ?: let {
+            GroupState(groupNumber = group).apply { it.save(this) }//没有则保存
+        }
     }
 
     override fun setGroupStateAndCache(group: String, groupStateEnum: GroupStateEnum): Boolean {
@@ -43,6 +51,21 @@ class GroupStateServiceImpl: GroupStateService, ServiceImpl<GroupStateMapper, Gr
         }else{
             false
         }
+    }
+
+    override fun getGroupListEnableLessonPush(isPush: Int): MutableList<GroupState> {
+        return list(KtQueryWrapper(GroupState::class.java).eq(GroupState::lessonPush, isPush))
+    }
+
+    override fun setGroupLessonPush(group: String, isPush: Int): Boolean {
+        return update(getGroupState(group).apply {
+
+                    if (this.lessonPush == isPush){
+                        return false
+                    }
+                    this.lessonPush = isPush
+                },
+            KtQueryWrapper(GroupState::class.java).eq(GroupState::groupNumber, group))
     }
 
 
