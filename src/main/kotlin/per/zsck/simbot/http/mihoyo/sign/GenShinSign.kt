@@ -54,10 +54,9 @@ class GenShinSign(
      * 获取cookie对应的Uid,获取对应信息
      */
     fun analyzeCookie(cookie: String): List<GenshinInfo> {
-        val result: JsonNode = doGetJson(String.format(
-                "https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=%s",
-                "hk4e_cn"
-            ), header = HeadersUtil.getBasicHeaders(cookie)
+        val result: JsonNode = doGetJson(
+            "https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_cn",
+            header = HeadersUtil.getBasicHeaders(cookie), isDefault = false
         )
         val resArr = result.get("data")?.get("list")
         val infoList: MutableList<GenshinInfo> = ArrayList()
@@ -100,8 +99,11 @@ class GenShinSign(
                 val data: Map<String, Any> = GenShinUtil.getSignDataMap(it)
 
                 val signResult: JsonNode = doPostJson(
-                    SignConstant.SIGN_URL,StringEntity(objectMapper.writeValueAsString(data)) ,
-                    HeadersUtil.getHeaders(it.cookie) )
+                    SignConstant.SIGN_URL,
+                    StringEntity(objectMapper.writeValueAsString(data)) ,
+                    HeadersUtil.getHeaders(it.cookie) ,
+                    false
+                )
                 logInfo("签到uid:{} 结果:{}, retcode:{}", it.uid, signResult.get("message"), signResult.get("retcode"))
                 builder.append("uid:").append(it.uid).append("\n昵称:").append(it.nickName).append("\n签到结果:")
                     .append(GenShinUtil.analyzeRet(if (signResult.get("ret") == null) signResult.get("retcode").asInt() else signResult.get("ret").asInt()))
@@ -113,7 +115,7 @@ class GenShinSign(
     }
 
     fun numberOfSign(info: GenshinInfo): SignDetail? {
-        val signInfoResult: JsonNode = doGetJson(SignConstant.INFO_URL, HeadersUtil.getHeaders(info.cookie), GenShinUtil.getSignDataMap(info))
+        val signInfoResult: JsonNode = doGetJson(SignConstant.INFO_URL, HeadersUtil.getHeaders(info.cookie), GenShinUtil.getSignDataMap(info), false)
 
         if (signInfoResult.get("message").asText().equals("OK")){
             return signInfoResult.get("data")?.let {
@@ -143,10 +145,8 @@ class GenShinSign(
             throw GenShinCookieException("cookie为空")
         }
         val result: JsonNode = doGetJson(
-            String.format(
-                "https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=%s",
-                "hk4e_cn"
-            ), header = HeadersUtil.getBasicHeaders(cookie)
+            "https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_cn" ,
+            header = HeadersUtil.getBasicHeaders(cookie), isDefault = false
         )
         val retcode: Int = result.get("retcode").asInt()
         if (retcode == SignConstant.RECODE3) {
