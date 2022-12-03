@@ -126,18 +126,22 @@ class GenShinSign(
     }
 
     private fun updateAwards(info: GenshinInfo): Boolean{
-        val listInfoResult: JsonNode = doGetJson(SignConstant.LIST_URL, HeadersUtil.getHeaders(info.cookie), GenShinUtil.getSignDataMap(info))
 
-        if (listInfoResult.get("message").asText().equals( "OK" )){
+        return info.cookie ?.let {
+            val listInfoResult: JsonNode = doGetJson(SignConstant.LIST_URL, HeadersUtil.getHeaders(it), GenShinUtil.getSignDataMap(info))
 
-            val awards = listInfoResult.get("data")?.get("awards")?.toList()?.stream()!!
-                .map { award -> objectMapper.readValue(award.toString(), Award::class.java)  }.toList()//TODO
-            if (awards.isNotEmpty()){
-                this.awards = awards
-                return true
+            if (listInfoResult.get("message").asText().equals( "OK" )){
+
+                val awards = listInfoResult.get("data")?.get("awards")?.toList()?.stream()!!
+                    .map { award -> objectMapper.readValue(award.toString(), Award::class.java)  }.toList()//TODO
+                if (awards.isNotEmpty()){
+                    this.awards = awards
+                    return@let true
+                }
             }
-        }
-        return false
+            return@let false
+        } ?: false
+
     }
 
     fun checkCookie(cookie: String?) {

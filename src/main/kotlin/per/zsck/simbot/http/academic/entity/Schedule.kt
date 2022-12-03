@@ -17,6 +17,7 @@ import java.time.Instant
  */
 @JsonIgnoreProperties("room")
 data class Schedule(
+
     @JsonProperty("lessonId")
     var lessonId: Int?,
     @JsonProperty("scheduleGroupId")

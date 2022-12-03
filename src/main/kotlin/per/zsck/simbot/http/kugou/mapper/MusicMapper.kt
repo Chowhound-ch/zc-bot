@@ -9,8 +9,8 @@ import per.zsck.simbot.http.kugou.entity.Music
  * @author zsck
  * @date   2022/11/10 - 13:02
  */
-@DS("music")
-@Mapper
-interface MusicMapper: BaseMapper<Music>{
-    fun likeAudioName(audioName: String): MutableList<Music>
-}
+//@DS("music")
+//@Mapper
+//interface MusicMapper: BaseMapper<Music>{
+//    fun likeAudioName(audioName: String): MutableList<Music>
+//}

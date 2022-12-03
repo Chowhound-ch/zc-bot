@@ -27,28 +27,28 @@ class SignTask (
     val groupStateCache: GroupStateCache
         ): MiraiBotManagerSupport(){
 
-
-    @Scheduled(cron = "00 00 10 * * ?")
-    fun sign(){
-
-        val list = genshinInfoService.list()
-
-
-        val msg = MiraiForwardMessageBuilder().apply {
-            list.forEach { info ->
-                genShinSign.doSignWithAward(info).let {
-
-                    this.add(miraiBot.id, "米游社签到", Timestamp.now(), genShinSign.getResMsg(info, it))
-
-                }
-            }
-        }
-        groupStateCache.getGroupsWithState(GroupStateEnum.OPENED_ALL).forEach {
-
-            runBlocking { miraiBot.group( it.ID )?.sendIfSupport(msg.build()) }
-
-        }
-
-    }
+//
+//    @Scheduled(cron = "00 00 10 * * ?")
+//    fun sign(){
+//
+//        val list = genshinInfoService.list()
+//
+//
+//        val msg = MiraiForwardMessageBuilder().apply {
+//            list.forEach { info ->
+//                genShinSign.doSignWithAward(info).let {
+//
+//                    this.add(miraiBot.id, "米游社签到", Timestamp.now(), genShinSign.getResMsg(info, it))
+//
+//                }
+//            }
+//        }
+//        groupStateCache.getGroupsWithState(GroupStateEnum.OPENED_ALL).forEach {
+//
+//            runBlocking { miraiBot.group( it.ID )?.sendIfSupport(msg.build()) }
+//
+//        }
+//
+//    }
 
 }

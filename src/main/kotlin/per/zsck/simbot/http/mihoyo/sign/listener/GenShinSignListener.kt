@@ -37,17 +37,32 @@ class GenShinSignListener(
         val author = author()
 
         MiraiForwardMessageBuilder().apply {
-            genshinInfoService.getGenshinInfoList(author.id.toString()).onEach {
+            genshinInfoService.getGenshinInfoList(author.id.toString()).let {
 
-                val numberOfSign = genShinSign.doSignWithAward(it)
 
-                this.add(author.id, "米游社签到", Timestamp.now(), genShinSign.getResMsg(it, numberOfSign) )
+
+                it.onEach { info->
+
+                    val numberOfSign = genShinSign.doSignWithAward(info)
+
+                    this.add(author.id, "米游社签到", Timestamp.now(), genShinSign.getResMsg(info, numberOfSign) )
+
+                }
+
+                if ( it.isNotEmpty() ){
+                    this.displayStrategy = GenshinSignDisplayStrategy
+
+                    sendIfSupport(this.build())
+                }else{
+                    sendIfSupport( buildMessages {
+                        this.append( At(author.id) ).append( " 你当前尚未绑定原神账号哦" )
+                    } )
+                }
 
             }
 
-            this.displayStrategy = GenshinSignDisplayStrategy
 
-            sendIfSupport(this.build())
+
         }
     }
 
