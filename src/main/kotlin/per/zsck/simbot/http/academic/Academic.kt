@@ -2,6 +2,8 @@ package per.zsck.simbot.http.academic
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
+import love.forte.simbot.message.Messages
+import love.forte.simbot.message.buildMessages
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.http.Header
 import org.apache.http.HttpHeaders
@@ -16,7 +18,6 @@ import per.zsck.simbot.http.academic.entity.ClassMap
 import per.zsck.simbot.http.academic.entity.Schedule
 import per.zsck.simbot.http.academic.service.ClassMapService
 import per.zsck.simbot.http.academic.service.ScheduleService
-import javax.annotation.PostConstruct
 
 
 /**
@@ -36,74 +37,100 @@ class Academic(
     lateinit var password: String
 
 
-    fun refresh(): Boolean{
-        logInfo("开始刷新表 class_map 及表 schedule 中内容...")
-        logInfo("清除表 class_map {} 条记录, 清除表 schedule {} 条记录", classMapService.removeAll(), scheduleService.removeAll())
+    fun refresh(): Messages{
 
-        try {
-            //访问中间网址，获取会话cookie和加密密钥
-            val encode = DigestUtils.sha1Hex("${doGetStr(GET_SALT)}-${password}") //密码加密
+        return buildMessages {
+            logInfo("开始刷新表 class_map 及表 schedule 中内容...")
+            "清除表 class_map %d 条记录, 清除表 schedule %d 条记录".format(classMapService.removeAll(),  scheduleService.removeAll() ).let {
+                logInfo( it )
+                this.append( it )
+            }
 
-            //登录验证
+
+            try {
+                //访问中间网址，获取会话cookie和加密密钥
+                val encode = DigestUtils.sha1Hex("${doGetStr(GET_SALT)}-${password}") //密码加密
+
+                //登录验证
 
 
-            val entity = StringEntity(
-                objectMapper.writeValueAsString(
-                    mutableMapOf(Pair("username", userName), Pair("password", encode), Pair("captcha", ""))
-                ), "UTF-8"
-            )
-            entity.setContentType("application/json")
-            val loginRes = doPostJson(LOGIN_URL, entity) //登录结果
+                val entity = StringEntity(
+                    objectMapper.writeValueAsString(
+                        mutableMapOf(Pair("username", userName), Pair("password", encode), Pair("captcha", ""))
+                    ), "UTF-8"
+                )
+                entity.setContentType("application/json")
+                val loginRes = doPostJson(LOGIN_URL, entity) //登录结果
 
-            //访问我的课程表，获取课程表中lessons的id
-            val lessonIds = doGetJson( LESSON_FOR_ID )["lessonIds"]
-            //TODO 待确认lessonIds.toString()结果
+                //访问我的课程表，获取课程表中lessons的id
+                val lessonIds = doGetJson( LESSON_FOR_ID )["lessonIds"]
+                //TODO 待确认lessonIds.toString()结果
 
-            //再次请求，根据lessonIds请求得到具体lesson信息
-            val entityForRes = StringEntity(
+                //再次请求，根据lessonIds请求得到具体lesson信息
+                val entityForRes = StringEntity(
                     objectMapper.writeValueAsString(
                         mutableMapOf(Pair("lessonIds", lessonIds), Pair("studentId", 152113), Pair("weekIndex", ""))
                     ), "UTF-8"
-            )
+                )
 
-            entityForRes.setContentType("application/json")
-            val lessonsRes = doPostJson(LESSON_URL, entityForRes)
+                entityForRes.setContentType("application/json")
+                val lessonsRes = doPostJson(LESSON_URL, entityForRes)
 
-            //对返回的lesson信息进行解析
-            try {
-                val scheduleList = ArrayList<Schedule>().apply {
-                    lessonsRes["result"]["scheduleList"].forEach { res: JsonNode ->
-                        try {
-                            val schedule: Schedule = objectMapper.readValue(res.toString(), Schedule::class.java)
-                            schedule.room = res["room"]["nameZh"].asText()
-                            this.add(schedule)
-                        } catch (e: JsonProcessingException) {
-                            logError("解析lesson信息错误: {}", e.message?: "")
-                            e.printStackTrace()
+                //对返回的lesson信息进行解析
+                try {
+                    val scheduleList = ArrayList<Schedule>().apply {
+                        lessonsRes["result"]["scheduleList"].forEach { res: JsonNode ->
+                            try {
+                                val schedule: Schedule = objectMapper.readValue(res.toString(), Schedule::class.java)
+                                schedule.room = res["room"]["nameZh"].asText()
+                                this.add(schedule)
+                            } catch (e: JsonProcessingException) {
+                                logError("解析lesson信息错误: {}", e.message?: "")
+                                e.printStackTrace()
+                            }
                         }
                     }
-                }
 
-                val classMapList = ArrayList<ClassMap>().apply {
-                    lessonsRes["result"]["lessonList"].forEach{ res ->
-                        this.add(
-                            ClassMap(res["id"].asInt(), res["courseName"].asText())
-                        )
+                    val classMapList = ArrayList<ClassMap>().apply {
+                        lessonsRes["result"]["lessonList"].forEach{ res ->
+                            this.add(
+                                ClassMap(res["id"].asInt(), res["courseName"].asText())
+                            )
+                        }
                     }
+
+                    if (scheduleService.saveBatch(scheduleList)) {
+                        "表schedule新增数据:${scheduleList.size}条".let {
+                            logInfo( it )
+                            this.append( it )
+                        }
+                    }
+                    if ( classMapService.saveBatch(classMapList) ){
+                        "表class_map新增数据:${classMapList.size}条".let {
+                            logInfo( it )
+                            this.append( it )
+                        }
+                    }
+                } catch (e: Exception) {
+
+                    "数据解析错误: ${e.message}".let {
+                        logError( it )
+                        this.append( it )
+                    }
+
+                    e.printStackTrace()
+                }
+            } catch (e: Exception) {
+                "访问网址错误: ${e.message}".let {
+                    logError( it )
+                    this.append( it )
                 }
 
-                logInfo("表schedule新增数据:" + scheduleService.saveBatch(scheduleList).toString() + "条")
-                logInfo("表class_map新增数据:" + classMapService.saveBatch(classMapList).toString() + "条")
-                return true
-            } catch (e: Exception) {
-                logError("数据解析错误: {}", e.message?: "")
                 e.printStackTrace()
             }
-        } catch (e: Exception) {
-            logError("访问网址错误: {}", e.message?: "")
-            e.printStackTrace()
         }
-        return false
+
+
     }
 
 

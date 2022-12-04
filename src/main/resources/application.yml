@@ -2,10 +2,10 @@ zsck:
   default-uid: 131649477
   permit:
     is-init: true
-    owner: ${OWNER}
+    owner: ${custom.owner_number}
   academic:
-    user-name: ${USERNAME_ACADEMIC}
-    password: ${PWD_ACADEMIC}
+    user-name: ${custom.academic.username}
+    password: ${custom.academic.password}
   kugou:
     enable-local: false
     remote-url-prefix: http://www.wolves.vip/music
@@ -28,9 +28,9 @@ spring:
       strict: false
       datasource:
         master:
-          url: ${MYSQL_URL}
-          username: ${MYSQL_USERNAME}
-          password: ${MYSQL_PASSWORD}
+          url: jdbc:mysql://${custom.mysql.host}:${custom.mysql.port}/my_class
+          username: ${custom.mysql.username}
+          password: ${custom.mysql.password}
           driver-class-name: com.mysql.cj.jdbc.Driver
           type: com.alibaba.druid.pool.DruidDataSource
           druid:
@@ -45,9 +45,9 @@ spring:
             test-on-borrow: true
             test-on-return: false
         music:
-          url: ${REMOTE_MYSQL_URL}
-          username: ${REMOTE_MYSQL_USERNAME}
-          password: ${REMOTE_MYSQL_PASSWORD}
+          url: jdbc:mysql://${custom.mysql.host}:${custom.mysql.port}/web
+          username: ${custom.mysql.username}
+          password: ${custom.mysql.password}
           driver-class-name: com.mysql.cj.jdbc.Driver
           type: com.alibaba.druid.pool.DruidDataSource
           druid:

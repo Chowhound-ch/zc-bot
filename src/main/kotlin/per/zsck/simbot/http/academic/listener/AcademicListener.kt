@@ -15,6 +15,7 @@ import per.zsck.simbot.core.permit.Permit
 import per.zsck.simbot.core.state.GroupStateConstant
 import per.zsck.simbot.core.state.GroupStateEnum
 import per.zsck.simbot.core.state.service.GroupStateService
+import per.zsck.simbot.http.academic.Academic
 import per.zsck.simbot.http.academic.service.ClassMapService
 import per.zsck.simbot.http.academic.service.ScheduleService
 import per.zsck.simbot.http.academic.util.AcademicUtil
@@ -31,7 +32,8 @@ class AcademicListener(
     val scheduleService: ScheduleService,
     val classMapService: ClassMapService,
     val academicUtil: AcademicUtil,
-    val groupStateService: GroupStateService
+    val groupStateService: GroupStateService,
+    val academic: Academic
 ){
 
     @RobotListen(stateLeast = GroupStateEnum.OPENED_ALL)
@@ -71,6 +73,7 @@ class AcademicListener(
         }
 
     }
+
     @RobotListen(stateLeast = GroupStateEnum.OPENED_ALL)
     @Filter("/?(d|D){{param,(\\+|-|=)?}}")
     suspend fun MessageEvent.day(@FilterValue("param")param: String){
@@ -121,6 +124,10 @@ class AcademicListener(
             sendIfSupport("群${groupNumber}的课表推送功能已是${desStateStr}状态")
         }
     }
+
+    @RobotListen(permission = Permit.HOST, stateLeast = GroupStateEnum.OPENED_ALL )
+    @Filter("/?刷新课表")
+    suspend fun MessageEvent.refreshSchedule() = sendIfSupport( academic.refresh() )
 
 
     fun getBalanceByParam(param: String): Standard {

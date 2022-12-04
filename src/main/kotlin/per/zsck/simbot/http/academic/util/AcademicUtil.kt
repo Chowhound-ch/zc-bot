@@ -21,11 +21,11 @@ class AcademicUtil(
     val classMapService: ClassMapService
 ) {
 
-    lateinit var mutaleClassmap: MutableMap<Int, String>
+    lateinit var mutableClassMap: MutableMap<Int, String>
 
     @PostConstruct
     fun init(){
-        mutaleClassmap = classMapService.list().stream().collect(Collectors.toMap({ item -> item.id}, ClassMap::className))
+        mutableClassMap = classMapService.list().stream().collect(Collectors.toMap({ item -> item.id}, ClassMap::className))
     }
 
     fun getLessonInfoMsg(classMap: ClassMap, classDetail: Map<String, Any> ): String{
@@ -63,7 +63,7 @@ class AcademicUtil(
                 val start = String.format("%02d", schedule.startTime / 100) + ":" + String.format("%02d", schedule.startTime % 100)
 
                 val end = String.format("%02d", schedule.endTime / 100) + ":" + String.format("%02d", schedule.endTime % 100)
-                builder.append("\n * $start - $end ${schedule.room} ${mutaleClassmap[schedule.lessonId]} ${schedule.personName}")
+                builder.append("\n * $start - $end ${schedule.room} ${mutableClassMap[schedule.lessonId]} ${schedule.personName}")
             }
         }
 
