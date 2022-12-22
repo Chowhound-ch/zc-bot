@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
 import per.zsck.simbot.http.kugou.entity.Music
+import java.util.regex.Pattern
 import javax.annotation.Resource
 
 /**
@@ -22,9 +23,8 @@ class MusicServiceImpl : MusicService {
     lateinit var mongoTemplate: MongoTemplate
 
     override fun likeMusic(audioName: String): MutableList<Music> {
-
-
-        return mongoTemplate.find( Query.query(Criteria.where( "audioNameIndex" ).regex( ".*${audioName}.*" )), Music::class.java )
+        return mongoTemplate.find( Query.query(Criteria.where( "audioNameIndex" )
+            .regex( Pattern.compile(".*${audioName}.*", Pattern.CASE_INSENSITIVE) )), Music::class.java )
     }
 
 }

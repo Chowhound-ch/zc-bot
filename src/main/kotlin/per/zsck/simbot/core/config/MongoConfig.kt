@@ -11,8 +11,4 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class MongoConfig {
 
-    @Bean
-    fun yy( mongoClient: MongoClient ){
-        return
-    }
 }

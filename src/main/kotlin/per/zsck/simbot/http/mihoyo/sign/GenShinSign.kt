@@ -127,7 +127,7 @@ class GenShinSign(
 
     private fun updateAwards(info: GenshinInfo): Boolean{
 
-        return info.cookie ?.let {
+        return info.cookie.let {
             val listInfoResult: JsonNode = doGetJson(SignConstant.LIST_URL, HeadersUtil.getHeaders(it), GenShinUtil.getSignDataMap(info))
 
             if (listInfoResult.get("message").asText().equals( "OK" )){
@@ -140,7 +140,7 @@ class GenShinSign(
                 }
             }
             return@let false
-        } ?: false
+        }
 
     }
 

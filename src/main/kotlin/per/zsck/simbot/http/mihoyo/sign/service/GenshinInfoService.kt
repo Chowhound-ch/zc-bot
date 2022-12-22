@@ -1,19 +1,8 @@
 package per.zsck.simbot.http.mihoyo.sign.service
 
-import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
-import com.baomidou.mybatisplus.extension.service.IService
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
-import org.bson.Document
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.insert
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
-import org.springframework.data.mongodb.core.query.Update
-import org.springframework.data.mongodb.core.remove
-import org.springframework.data.mongodb.repository.MongoRepository
-import org.springframework.data.mongodb.repository.cdi.MongoRepositoryBean
-import org.springframework.data.mongodb.repository.support.MongoRepositoryFactory
-import org.springframework.data.mongodb.repository.support.SimpleMongoRepository
 import org.springframework.stereotype.Service
 import per.zsck.simbot.common.utils.saveOrUpdate
 import per.zsck.simbot.http.mihoyo.sign.entity.GenshinInfo
@@ -41,6 +30,7 @@ interface GenshinInfoService{
     fun getGenshinInfoList(qqNumber: String): List<GenshinInfo>
 
     fun removeGenshinInfo(uid: String): Boolean
+    fun list(): List<GenshinInfo>
 }
 
 @Service
@@ -73,6 +63,10 @@ class GenshinInfoServiceImpl : GenshinInfoService{
     }
 
     override fun removeGenshinInfo(uid: String): Boolean {
-        return mongoTemplate.remove( Query.query(Criteria.where("uid").`is`( uid )) ).wasAcknowledged()
+        return mongoTemplate.remove( Query.query(Criteria.where("uid").`is`( uid )), GenshinInfo::class.java ).wasAcknowledged()
+    }
+
+    override fun list(): List<GenshinInfo> {
+        return mongoTemplate.findAll(GenshinInfo::class.java)
     }
 }

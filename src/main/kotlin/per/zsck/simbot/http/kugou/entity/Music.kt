@@ -26,6 +26,9 @@ class Music{
             field = value
         }
 
+    /**
+     * 不包含空格的audioName，用于模糊查询
+     */
     var audioNameIndex: String? = null
 
     @JsonAlias("SongName", "song_name")

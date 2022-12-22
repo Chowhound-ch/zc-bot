@@ -7,15 +7,15 @@ zsck:
     user-name: ${custom.academic.username}
     password: ${custom.academic.password}
   kugou:
-    enable-local: false
-    remote-url-prefix: http://www.wolves.vip/music
+    enable-local: true
     add-music-mapping: /add
+    index-url: ${custom.kugou.index-url}
 
 
 
 logging:
   level:
-    com.zsck: info
+    per.zsck: info
 
 spring:
   profiles:
@@ -67,7 +67,8 @@ spring:
       FAIL_ON_UNKNOWN_PROPERTIES: false
   data:
     mongodb:
-      uri: mongodb://${custom.mongodb.username}:${custom.mongodb.password}@${custom.mongodb.host}:${custom.mongodb.port}/my_bot
+      uri: mongodb://${custom.mongodb.host}:${custom.mongodb.port}/my_bot
+#      uri: mongodb://${custom.mongodb.username}:${custom.mongodb.password}@${custom.mongodb.host}:${custom.mongodb.port}/my_bot
       field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 #      username: ${custom.mongodb.username}
 #      password: ${custom.mongodb.password}

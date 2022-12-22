@@ -24,6 +24,7 @@ import kotlin.time.Duration.Companion.seconds
  * @author zsck
  * @date   2022/11/3 - 22:21
  */
+@Suppress("unused")
 @Component
 class GenShinSignListener(
     val genShinSign: GenShinSign,
@@ -60,8 +61,6 @@ class GenShinSignListener(
                 }
 
             }
-
-
 
         }
     }

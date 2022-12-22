@@ -17,6 +17,7 @@ import java.util.*
  * @author zsck
  * @date   2022/11/6 - 15:28
  */
+@Suppress("unused")
 @Component
 class PermitListener (
     val permitDetailService: PermitDetailService

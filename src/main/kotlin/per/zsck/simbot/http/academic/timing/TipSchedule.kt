@@ -48,8 +48,6 @@ class TipSchedule  (
     @PostConstruct
     fun init(){
         scheduledExecutorService = Executors.newScheduledThreadPool(5)
-
-        miraiBot.friends
     }
 
     @Scheduled(cron = "0 40 7 * * 1-5")

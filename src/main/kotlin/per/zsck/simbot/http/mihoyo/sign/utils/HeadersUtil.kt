@@ -48,7 +48,9 @@ object HeadersUtil {
     }
 
     fun getHeaders(cookie: String): Array<Header> {
-        return Builder.add("x-rpc-device_id", UUID.randomUUID().toString().replace("-", "").toUpperCase())
+        return Builder.add("x-rpc-device_id",
+            UUID.randomUUID().toString().replace("-", "").uppercase(Locale.getDefault())
+        )
             .add("Content-Type", "application/json;charset=UTF-8")
             .add("x-rpc-client_type", "2")
             .add("x-rpc-app_version", "2.34.1")

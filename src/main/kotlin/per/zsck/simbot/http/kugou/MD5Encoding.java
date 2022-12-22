@@ -10,10 +10,9 @@ import java.util.List;
  * @author QQ:825352674
  * @date 2022/8/11 - 19:40
  */
+@SuppressWarnings("all")
 public class MD5Encoding {
     public static String MD5(String a){
-//        String time = "1600305065609";
-//        String url = "NVPh5oo715z5DIWAeQlhMDsWXXQV4hwtbitrate=0callback=callback123clienttime="+time+"clientver=2000dfid=-inputtype=0iscorrection=1isfuzzy=0keyword="+a+"mid="+time+"page=1pagesize=30platform=WebFilterprivilege_filter=0srcappid=2919tag=emuserid=-1uuid="+time+"NVPh5oo715z5DIWAeQlhMDsWXXQV4hwt";
         String urlEn = "NVPh5oo715z5DIWAeQlhMDsWXXQV4hwtbitrate=0callback=callback123clienttime=1600305065609clientver=2000dfid=-inputtype=0iscorrection=1isfuzzy=0keyword="+a+"mid=1600305065609page=1pagesize=30platform=WebFilterprivilege_filter=0srcappid=2919tag=emuserid=-1uuid=1600305065609NVPh5oo715z5DIWAeQlhMDsWXXQV4hwt";
         return o(urlEn);
     }
@@ -21,9 +20,6 @@ public class MD5Encoding {
     /**
      * js和java中>>>效果并不一样，故以此替代js中的 >>>
      * js : from >>> num  ===  replace( from, num)
-     * @param from
-     * @param num
-     * @return
      */
     private static Long replace(Long from, Long num){
         if (from < 0){
@@ -34,8 +30,6 @@ public class MD5Encoding {
 
     /**
      * ~ 按位取反
-     * @param from
-     * @return
      */
     private static Long reverse(Long from){
         return from ^ 4294967295L;
@@ -43,8 +37,6 @@ public class MD5Encoding {
 
     /**
      * & 与
-     * @param
-     * @return
      */
     private static Integer and(Long left, Long right){
         return (int) (left & right);
@@ -78,20 +70,20 @@ public class MD5Encoding {
         return b ^ (a | reverse(c));
     }
     private static Long j(List<Long> a, Long b){
-        Integer dex = b.intValue();
+        int dex = b.intValue();
         return (a.get(dex + 3) << 24) | (a.get(dex + 2) << 16) | (a.get(dex+ 1) << 8) | a.get(dex);
     }
     private static List<Long> k(String a){
         List<Long> b = new ArrayList<>();
-        for (Integer c = 0; c < a.length() ; c++) {
+        for (int c = 0; c < a.length() ; c++) {
             if (a.codePointAt(c) <= 127) {
                 b.add(Integer.valueOf(a.codePointAt(c)).longValue());
             }
             else {
                 String[] d = URLEncodeUtil.encode(String.valueOf(a.charAt(c))).substring(1).split("%");
 
-                for (Integer e = 0; e < d.length; e++) {
-                    b.add(Long.parseLong(d[e] , 16));
+                for (String s : d) {
+                    b.add(Long.parseLong(s, 16));
                 }
             }
         }
@@ -99,7 +91,7 @@ public class MD5Encoding {
     }
     private static String l(Long...arguments){
         String a = "";
-        for (Long c = 0L, d = 0L, e = 3L; e >= 0L; e--) {
+        for (Long c, d, e = 3L; e >= 0L; e--) {
             d = arguments[e.intValue()];
             c = 255 & d;
             d= replace(d, 8L);
@@ -121,11 +113,6 @@ public class MD5Encoding {
 
     /**
      * 0 - 3  v, u, t, s;
-     * @param temp
-     * @param a
-     * @param b
-     * @param c
-     * @param d
      */
     private static void a(List<Long> temp ,Long a, Long b, Long c, Long d){
         Long f = temp.get(0);
@@ -137,7 +124,6 @@ public class MD5Encoding {
 
     /**
      * @param a 待加密字符串
-     * @return
      */
     private static String o(String a){
         List<Long> p = k(a);
