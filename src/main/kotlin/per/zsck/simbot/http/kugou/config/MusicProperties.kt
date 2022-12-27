@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component
 //@Component
 @ConfigurationProperties(prefix = "zsck.kugou", ignoreInvalidFields = true)
 class MusicProperties {
-    lateinit var remoteUrlPrefix: String
     lateinit var addMusicMapping: String
     lateinit var searchMusicMapping: String
 }

@@ -1,17 +1,19 @@
 package per.zsck.simbot.http.mihoyo.sign.service
 
-import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
-import com.baomidou.mybatisplus.extension.service.IService
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
+import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
+import per.zsck.simbot.common.utils.saveOrUpdate
 import per.zsck.simbot.http.mihoyo.sign.entity.GenshinInfo
-import per.zsck.simbot.http.mihoyo.sign.mapper.GenshinInfoMapper
+import javax.annotation.Resource
 
 /**
  * @author zsck
  * @date   2022/10/31 - 20:14
  */
-interface GenshinInfoService: IService<GenshinInfo>{
+
+interface GenshinInfoService{
     fun getGenshinInfo(uid: String): GenshinInfo?
 
     /**
@@ -28,17 +30,26 @@ interface GenshinInfoService: IService<GenshinInfo>{
     fun getGenshinInfoList(qqNumber: String): List<GenshinInfo>
 
     fun removeGenshinInfo(uid: String): Boolean
+    fun list(): List<GenshinInfo>
 }
 
 @Service
-class GenshinInfoServiceImpl: GenshinInfoService, ServiceImpl<GenshinInfoMapper, GenshinInfo>(){
+class GenshinInfoServiceImpl : GenshinInfoService{
+    @Resource
+    lateinit var mongoTemplate: MongoTemplate
+
+
+
     override fun getGenshinInfo(uid: String): GenshinInfo? {
 
-        return getOne(KtQueryWrapper(GenshinInfo::class.java).eq(GenshinInfo::uid, uid))
+        return mongoTemplate.findOne(Query.query(Criteria.where("uid").`is`(uid)), GenshinInfo::class.java)
+
     }
 
     override fun saveGenshinInfo(info: GenshinInfo): Boolean {
-        return saveOrUpdate(info, KtQueryWrapper(GenshinInfo::class.java).eq(GenshinInfo::uid, info.uid))
+
+        return mongoTemplate.saveOrUpdate(Query.query(Criteria.where("uid").`is`( info.uid )), info).wasAcknowledged()
+
     }
 
     override fun saveGenshinInfo(info: GenshinInfo, qqNumber: String): Boolean {
@@ -47,10 +58,15 @@ class GenshinInfoServiceImpl: GenshinInfoService, ServiceImpl<GenshinInfoMapper,
     }
 
     override fun getGenshinInfoList(qqNumber: String): List<GenshinInfo> {
-        return list(KtQueryWrapper(GenshinInfo::class.java).eq(GenshinInfo::qqNumber, qqNumber))
+        return  mongoTemplate.find( Query.query(Criteria.where( "qqNumber" ).`is`( qqNumber )) , GenshinInfo::class.java)
+
     }
 
     override fun removeGenshinInfo(uid: String): Boolean {
-        return remove( KtQueryWrapper(GenshinInfo::class.java).eq(GenshinInfo::uid, uid) )
+        return mongoTemplate.remove( Query.query(Criteria.where("uid").`is`( uid )), GenshinInfo::class.java ).wasAcknowledged()
+    }
+
+    override fun list(): List<GenshinInfo> {
+        return mongoTemplate.findAll(GenshinInfo::class.java)
     }
 }

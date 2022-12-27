@@ -5,12 +5,11 @@ import love.forte.simboot.annotation.Listener
 import love.forte.simbot.PriorityConstant
 import love.forte.simbot.event.GroupMessageEvent
 import org.springframework.core.annotation.AliasFor
-import per.zsck.simbot.common.enums.RobotPermission
 import per.zsck.simbot.core.permit.Permit
 import per.zsck.simbot.core.state.GroupStateEnum
 
 /**
- * @author wuyou
+ * @author wuyou 、 zsck
  */
 @Suppress("OPT_IN_USAGE", "unused")
 @Retention(AnnotationRetention.RUNTIME)

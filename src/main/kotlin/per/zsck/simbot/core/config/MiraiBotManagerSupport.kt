@@ -1,6 +1,7 @@
 package per.zsck.simbot.core.config
 
 import cn.hutool.extra.spring.SpringUtil
+import love.forte.simbot.bot.OriginBotManager
 import love.forte.simbot.component.mirai.bot.MiraiBot
 import love.forte.simbot.component.mirai.bot.MiraiBotManager
 import org.springframework.boot.ApplicationArguments
@@ -12,6 +13,7 @@ import org.springframework.boot.ApplicationRunner
  * @date   2022/11/14 - 22:35
  */
 abstract class MiraiBotManagerSupport : ApplicationRunner{
+
     lateinit var miraiBotManager: MiraiBotManager
 
     lateinit var miraiBot: MiraiBot

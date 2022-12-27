@@ -39,7 +39,7 @@ class MusicConfig(
             }
 
 
-            val localMusicMaxSize =(if (need > 5) need - 5 else 0).let { // 搜索5条以上则需要从本地获取5条以上的记录
+            val localMusicMaxSize =(if (need > 5) need - 5 else 0).let { // 搜索5条以上则需要从本地获取n - 5条以上的记录
                 if (it > localMusicList.size){  //如果本地记录数不够再从网络获取
                     return@let localMusicList.size
                 }else{

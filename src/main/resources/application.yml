@@ -7,15 +7,15 @@ zsck:
     user-name: ${custom.academic.username}
     password: ${custom.academic.password}
   kugou:
-    enable-local: false
-    remote-url-prefix: http://www.wolves.vip/music
+    enable-local: true
     add-music-mapping: /add
+    index-url: ${custom.kugou.index-url}
 
 
 
 logging:
   level:
-    com.zsck: info
+    per.zsck: info
 
 spring:
   profiles:
@@ -44,27 +44,35 @@ spring:
             test-while-idle: true
             test-on-borrow: true
             test-on-return: false
-        music:
-          url: jdbc:mysql://${custom.mysql.host}:${custom.mysql.port}/web
-          username: ${custom.mysql.username}
-          password: ${custom.mysql.password}
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          type: com.alibaba.druid.pool.DruidDataSource
-          druid:
-            initial-size: 5
-            min-idle: 5
-            max-active: 20
-            max-wait: 60000
-            time-between-eviction-runs-millis: 60000
-            min-evictable-idle-time-millis: 30000
-            validation-query: SELECT 1 FROM DUAL
-            test-while-idle: true
-            test-on-borrow: true
-            test-on-return: false
+#        music:
+#          url: ${REMOTE_MYSQL_URL}
+#          username: ${REMOTE_MYSQL_USERNAME}
+#          password: ${REMOTE_MYSQL_PASSWORD}
+#          driver-class-name: com.mysql.cj.jdbc.Driver
+#          type: com.alibaba.druid.pool.DruidDataSource
+#          druid:
+#            initial-size: 5
+#            min-idle: 5
+#            max-active: 20
+#            max-wait: 60000
+#            time-between-eviction-runs-millis: 60000
+#            min-evictable-idle-time-millis: 30000
+#            validation-query: SELECT 1 FROM DUAL
+#            test-while-idle: true
+#            test-on-borrow: true
+#            test-on-return: false
   jackson:
     property-naming-strategy: SNAKE_CASE
     deserialization:
       FAIL_ON_UNKNOWN_PROPERTIES: false
+  data:
+    mongodb:
+#      uri: mongodb://${custom.mongodb.host}:${custom.mongodb.port}/my_bot
+      uri: mongodb://${custom.mongodb.username}:${custom.mongodb.password}@${custom.mongodb.host}:${custom.mongodb.port}/my_bot
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
+      username: ${custom.mongodb.username}
+      password: ${custom.mongodb.password}
+      database: my_bot
 mybatis-plus:
   global-config:
     db-config:

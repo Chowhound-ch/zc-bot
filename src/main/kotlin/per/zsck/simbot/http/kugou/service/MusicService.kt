@@ -1,23 +1,31 @@
 package per.zsck.simbot.http.kugou.service
 
-import com.baomidou.mybatisplus.extension.service.IService
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
+import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
 import per.zsck.simbot.http.kugou.entity.Music
-import per.zsck.simbot.http.kugou.mapper.MusicMapper
+import java.util.regex.Pattern
+import javax.annotation.Resource
 
 /**
  * @author zsck
  * @date   2022/11/10 - 13:04
  */
-interface MusicService: IService<Music>{
+interface MusicService {
+    // 通过歌曲名获取歌曲,模糊查询
     fun likeMusic(audioName: String): MutableList<Music>
 }
 
 @Service
-class MusicServiceImpl: MusicService, ServiceImpl<MusicMapper, Music>(){
+class MusicServiceImpl : MusicService {
+
+    @Resource
+    lateinit var mongoTemplate: MongoTemplate
+
     override fun likeMusic(audioName: String): MutableList<Music> {
-        return baseMapper.likeAudioName(audioName)
+        return mongoTemplate.find( Query.query(Criteria.where( "audioNameIndex" )
+            .regex( Pattern.compile(".*${audioName}.*", Pattern.CASE_INSENSITIVE) )), Music::class.java )
     }
 
 }
