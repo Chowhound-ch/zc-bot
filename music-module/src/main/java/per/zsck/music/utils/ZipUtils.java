@@ -1,18 +1,17 @@
 package per.zsck.music.utils;
 
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.ZipUtil;
-import com.mongodb.client.gridfs.GridFSBucket;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 import per.zsck.music.entity.Music;
 import per.zsck.music.service.MusicService;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -50,7 +49,7 @@ public class ZipUtils {
                         //是音频文件则将其保存到库
                         resList.add(
                                 musicService.analysisAndUpload(
-                                        entry.getName(),
+                                        entry.getName().substring( entry.getName().lastIndexOf("/") + 1 ),
                                         IoUtil.readBytes(zipFile.getInputStream(entry))
                                 )
                         );

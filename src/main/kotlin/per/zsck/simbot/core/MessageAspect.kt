@@ -27,7 +27,7 @@ class MessageAspect(
     val permitDetailService: PermitDetailService,
     ): MiraiBotManagerSupport() {
 
-
+    // 消息监听，拦截所有带有@RobotListen注解的方法
     @Around("@annotation(per.zsck.simbot.common.annotation.RobotListen) && @annotation(annotation))")
     fun ProceedingJoinPoint.doAroundAdvice(annotation: RobotListen): Any? {
         val event = args.find { it is Event } ?: return proceed()
@@ -49,7 +49,7 @@ class MessageAspect(
 
         }
 
-
+        // 判断是否为群消息
         if (event is GroupMessageEvent) {
             val group = runBlocking { event.group() }
             val author = runBlocking { event.author() }

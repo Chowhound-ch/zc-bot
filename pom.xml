@@ -259,6 +259,12 @@
             <id>repo1</id>
             <url>http://repo1.maven.org/maven2/</url>
         </repository>
+    </repositories>
+    <repositories>
+        <repository>
+            <id>repo1</id>
+            <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+        </repository>
     </repositories>-->
 
 </project>

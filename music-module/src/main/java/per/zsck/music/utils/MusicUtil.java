@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import per.zsck.music.entity.Music;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +17,15 @@ import java.util.List;
 @Configuration
 public class MusicUtil {
     public static String URL_PREFIX;
-    public static final List<String> musicEnds = List.of( "mp3", "flac", "ape", "wav" );
+    public static List<String> musicEnds;
+
+    public MusicUtil() {
+        musicEnds = new ArrayList<>();
+        musicEnds.add("mp3");
+        musicEnds.add("flac");
+        musicEnds.add("ape");
+        musicEnds.add("wav");
+    }
 
     @Value("${per.zsck.music.url-prefix}")
     public void setUrlPrefix(String urlPrefix) {
@@ -36,7 +45,6 @@ public class MusicUtil {
             music.setArtist(artist);
         }
 
-        music.setAudioName(music.getArtist() + " - " + music.getTitle());
         return music;
     }
 

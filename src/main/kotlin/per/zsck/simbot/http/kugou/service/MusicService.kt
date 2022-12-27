@@ -13,6 +13,7 @@ import javax.annotation.Resource
  * @date   2022/11/10 - 13:04
  */
 interface MusicService {
+    // 通过歌曲名获取歌曲,模糊查询
     fun likeMusic(audioName: String): MutableList<Music>
 }
 

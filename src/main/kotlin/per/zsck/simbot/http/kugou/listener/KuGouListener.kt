@@ -30,8 +30,7 @@ class KuGouListener(
     val musicService: MusicService
 ) {
 
-
-
+    // 搜索音乐
     @OptIn(ExperimentalSimbotApi::class)
     @RobotListen
     @Filter("^/点歌\\s*{{param,(-d|D)?}}\\s*{{keyword}}")
@@ -104,12 +103,12 @@ class KuGouListener(
     }
 
 
-
     @RobotListen
     @Filter("^/上传歌曲")
     suspend fun GroupMessageEvent.uploadMusic(){
         sendIfSupport("请访问网站")
     }
+
 
     fun getMusicShare(music: Music): Message.Element<*>? {
         return try {

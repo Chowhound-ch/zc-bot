@@ -17,15 +17,17 @@ spring:
       FAIL_ON_UNKNOWN_PROPERTIES: false
   data:
     mongodb:
-#      uri: mongodb://${custom.mongodb.username}:${custom.mongodb.password}@${custom.mongodb.host}:${custom.mongodb.port}/${spring.data.mongodb.database}
-      uri: mongodb://${custom.mongodb.host}:${custom.mongodb.port}/${spring.data.mongodb.database}
+      uri: mongodb://${custom.mongodb.username}:${custom.mongodb.password}@${custom.mongodb.host}:${custom.mongodb.port}/${spring.data.mongodb.database}
+#      uri: mongodb://${custom.mongodb.host}:${custom.mongodb.port}/${spring.data.mongodb.database}
       field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
       database: my_bot
+      username: ${custom.mongodb.username}
+      password: ${custom.mongodb.password}
       gridfs:
         database: my_bot
   servlet:
     multipart:
-      max-file-size: 1024MB
-      max-request-size: 1030MB
+      max-file-size: 2048MB
+      max-request-size: 2048MB
 server:
   port: 8080

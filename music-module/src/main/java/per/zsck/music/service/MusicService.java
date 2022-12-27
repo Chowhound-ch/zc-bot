@@ -1,7 +1,6 @@
 package per.zsck.music.service;
 
 
-import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import per.zsck.music.entity.Music;
@@ -15,12 +14,13 @@ import java.util.List;
 
 public interface MusicService {
 
+    boolean removeMusicByFileId(String fileId);
 
     GridFsResource getMusicFileByFileId(String fileId);
 
     List<Music> likeMusic(String keyword);
 
-    ObjectId uploadMusic(Music music, byte[] bytes);
+    ObjectId uploadMusicAndReplace(Music music, byte[] bytes);
 
     Music analysisAndUpload(String fileName, byte[] bytes);
 

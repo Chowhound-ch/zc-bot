@@ -4,7 +4,6 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.mongodb.client.gridfs.model.GridFSFile;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -21,8 +20,10 @@ import per.zsck.music.service.MusicService;
 import per.zsck.music.utils.FIleUtils;
 import per.zsck.music.utils.MusicUtil;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -34,6 +35,11 @@ public class MusicServiceImpl implements MusicService {
     @Resource
     private GridFsTemplate gridFsTemplate;
 
+
+    @Override
+    public boolean removeMusicByFileId(String fileId) {
+        return mongoTemplate.remove( Query.query( Criteria.where("fileId").is( new ObjectId( fileId ) ) ), Music.class ).wasAcknowledged();
+    }
 
     @Override
     public GridFsResource getMusicFileByFileId(String fileId) {
@@ -55,11 +61,15 @@ public class MusicServiceImpl implements MusicService {
     }
 
     @Override
-    public ObjectId uploadMusic(Music music, byte[] bytes) {
+    public ObjectId uploadMusicAndReplace(Music music, byte[] bytes) {
         String md5 = DigestUtil.md5Hex(bytes);
         GridFSFile usedFile = gridFsTemplate.findOne(Query.query(Criteria.where("metadata.MD5").is(md5)));
         if (usedFile != null){
-            return null;
+            Objects.requireNonNull( usedFile.getMetadata() );
+            log.warn( "文件 name:{}, MD5:{}, 重复上传, 已删除原有文件", usedFile.getFilename(), usedFile.getMetadata().get("MD5") );
+            gridFsTemplate.delete( Query.query(Criteria.where("metadata.MD5").is(md5)) );
+
+            removeMusicByFileId( usedFile.getObjectId().toHexString() );
         }
 
         music.setFileId(
@@ -77,7 +87,7 @@ public class MusicServiceImpl implements MusicService {
 
         Music music = analysisOfMusic(fileName , bytes);
 
-        if (uploadMusic( music, bytes ) != null) {
+        if (uploadMusicAndReplace( music, bytes ) != null) {
             music.setUrl(MusicUtil.URL_PREFIX + music.getFileId());
 
             mongoTemplate.save( music);
@@ -111,23 +121,28 @@ public class MusicServiceImpl implements MusicService {
 
         }
 
+        File tempFile = FIleUtils.createTempFileAndLog("." + FIleUtils.getFileNameSuffix(fileNameWithSuffix));
+
         try {
-            File tempFile = FIleUtils.createTempFileAndLog("." + FIleUtils.getFileNameSuffix(fileNameWithSuffix));
 
             AudioFile audioFile = AudioFileIO.read(FileUtil.writeBytes(bytes, tempFile));
             log.info("成功向临时文件:{} 中写入:{} 长度的内容", tempFile.getName(), bytes.length);
 
 
-            MusicUtil.analysisOfAudioFile(audioFile, music)
-                    .setFileName(music.getAudioName() + "." + FIleUtils.getFileNameSuffix(fileNameWithSuffix));
-            log.info("歌曲:{}, 对应临时文件为:{}",  music.getAudioName(), tempFile.getName());
+            MusicUtil.analysisOfAudioFile(audioFile, music);
+            log.info("歌曲:{}, 对应临时文件为:{}",  fileNameWithSuffix, tempFile.getName());
 
-            music.setMd5( DigestUtil.md5Hex( bytes ) );
 
-            FIleUtils.deleteAndLog( tempFile );
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("文件: {} - {}  读取签名错误，正采在根据文件名分析歌曲信息，请保证文件名格式正确", music.getArtist(), music.getTitle());
+
         }
+
+        music.setAudioName(music.getArtist() + " - " + music.getTitle());
+        music.setFileName(music.getAudioName() + "." + FIleUtils.getFileNameSuffix(fileNameWithSuffix));
+        music.setMd5( DigestUtil.md5Hex( bytes ) );
+
+        FIleUtils.deleteAndLog( tempFile );
 
         return music;
     }

@@ -17,15 +17,15 @@ class GenshinInfo {
     var nickName: String = "未知用户"
     var cookie: String = ""
     var uid: String = "100"
-        set(value) {
-            if (uid[0] >= '5'){
-                this.serverType = ServerType.FOREIGN
-            }
-            field = value
-        }
 
     @Transient
     var serverType: ServerType = ServerType.OFFICIAL
+        get() {
+            if (uid[0] >= '5'){
+                this.serverType = ServerType.FOREIGN
+            }
+            return field
+        }
 
     constructor()
 
@@ -36,6 +36,5 @@ class GenshinInfo {
     constructor( uid: String, nickName: String, cookie: String ): this(uid){
         this.nickName = nickName
         this.cookie = cookie
-
     }
 }

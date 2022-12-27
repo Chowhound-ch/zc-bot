@@ -67,13 +67,12 @@ spring:
       FAIL_ON_UNKNOWN_PROPERTIES: false
   data:
     mongodb:
-      uri: mongodb://${custom.mongodb.host}:${custom.mongodb.port}/my_bot
-#      uri: mongodb://${custom.mongodb.username}:${custom.mongodb.password}@${custom.mongodb.host}:${custom.mongodb.port}/my_bot
+#      uri: mongodb://${custom.mongodb.host}:${custom.mongodb.port}/my_bot
+      uri: mongodb://${custom.mongodb.username}:${custom.mongodb.password}@${custom.mongodb.host}:${custom.mongodb.port}/my_bot
       field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
-#      username: ${custom.mongodb.username}
-#      password: ${custom.mongodb.password}
-#      database: my_bot
-#      authentication-database: admin
+      username: ${custom.mongodb.username}
+      password: ${custom.mongodb.password}
+      database: my_bot
 mybatis-plus:
   global-config:
     db-config:
