@@ -1,12 +1,12 @@
 package per.zsck.simbot.core.state.service
 
+import cn.hutool.extra.spring.SpringUtil
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.service.IService
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.stereotype.Service
-import per.zsck.simbot.common.utils.BeanUtil
 import per.zsck.simbot.core.state.GroupStateCache
 import per.zsck.simbot.core.state.GroupStateEnum
 import per.zsck.simbot.core.state.entity.GroupState
@@ -70,6 +70,6 @@ class GroupStateServiceImpl: GroupStateService, ServiceImpl<GroupStateMapper, Gr
 
 
     override fun run(args: ApplicationArguments?) {
-        groupStateCache = BeanUtil.getBean(GroupStateCache::class.java)
+        groupStateCache = SpringUtil.getBean(GroupStateCache::class.java)
     }
 }
