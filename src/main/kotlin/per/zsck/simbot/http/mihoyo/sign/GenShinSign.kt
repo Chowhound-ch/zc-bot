@@ -7,7 +7,8 @@ import love.forte.simbot.resources.URLResource
 import org.apache.http.entity.StringEntity
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import per.zsck.custom.util.http.HttpBase
+import per.zsck.custom.util.http.HttpUtil
+import per.zsck.custom.util.jackson.JacksonUtil
 import per.zsck.simbot.common.logError
 import per.zsck.simbot.common.logInfo
 import per.zsck.simbot.common.logWarn
@@ -28,9 +29,7 @@ import kotlin.streams.toList
  * @date   2022/11/1 - 9:28
  */
 @Component
-class GenShinSign(
-    var genshinInfoService: GenshinInfoService
-): HttpBase(){
+class GenShinSign(var genshinInfoService: GenshinInfoService){
     var awards: List<Award>? = null
 
     @Value("\${zsck.default-uid}")
@@ -54,9 +53,9 @@ class GenShinSign(
      * 获取cookie对应的Uid,获取对应信息
      */
     fun analyzeCookie(cookie: String): List<GenshinInfo> {
-        val result: JsonNode = doGetJson(
+        val result: JsonNode = HttpUtil.doGetJson(
             "https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_cn",
-            header = HeadersUtil.getBasicHeaders(cookie), isDefault = false
+            header = HeadersUtil.getBasicHeaders(cookie)
         )
         val resArr = result.get("data")?.get("list")
         val infoList: MutableList<GenshinInfo> = ArrayList()
@@ -98,11 +97,10 @@ class GenShinSign(
                 checkCookie(it.cookie)
                 val data: Map<String, Any> = GenShinUtil.getSignDataMap(it)
 
-                val signResult: JsonNode = doPostJson(
+                val signResult: JsonNode = HttpUtil.doPostJson(
                     SignConstant.SIGN_URL,
-                    StringEntity(objectMapper.writeValueAsString(data)) ,
+                    StringEntity(JacksonUtil.toJsonString(data)) ,
                     HeadersUtil.getHeaders(it.cookie) ,
-                    false
                 )
                 logInfo("签到uid:{} 结果:{}, retcode:{}", it.uid, signResult.get("message"), signResult.get("retcode"))
                 builder.append("uid:").append(it.uid).append("\n昵称:").append(it.nickName).append("\n签到结果:")
@@ -115,11 +113,11 @@ class GenShinSign(
     }
 
     fun numberOfSign(info: GenshinInfo): SignDetail? {
-        val signInfoResult: JsonNode = doGetJson(SignConstant.INFO_URL, HeadersUtil.getHeaders(info.cookie), GenShinUtil.getSignDataMap(info), false)
+        val signInfoResult: JsonNode = HttpUtil.doGetJson(SignConstant.INFO_URL, HeadersUtil.getHeaders(info.cookie), GenShinUtil.getSignDataMap(info))
 
         if (signInfoResult.get("message").asText().equals("OK")){
             return signInfoResult.get("data")?.let {
-                objectMapper.readValue(it.toString(), SignDetail::class.java)
+                JacksonUtil.readValue(it.toString(), SignDetail::class.java)
             }
         }
         return null
@@ -128,12 +126,12 @@ class GenShinSign(
     private fun updateAwards(info: GenshinInfo): Boolean{
 
         return info.cookie.let {
-            val listInfoResult: JsonNode = doGetJson(SignConstant.LIST_URL, HeadersUtil.getHeaders(it), GenShinUtil.getSignDataMap(info))
+            val listInfoResult: JsonNode = HttpUtil.doGetJson(SignConstant.LIST_URL, HeadersUtil.getHeaders(it), GenShinUtil.getSignDataMap(info))
 
             if (listInfoResult.get("message").asText().equals( "OK" )){
 
                 val awards = listInfoResult.get("data")?.get("awards")?.toList()?.stream()!!
-                    .map { award -> objectMapper.readValue(award.toString(), Award::class.java)  }.toList()//TODO
+                    .map { award -> JacksonUtil.readValue(award.toString(), Award::class.java)  }.toList()//TODO
                 if (awards.isNotEmpty()){
                     this.awards = awards
                     return@let true
@@ -148,9 +146,9 @@ class GenShinSign(
         if (cookie == null){
             throw GenShinCookieException("cookie为空")
         }
-        val result: JsonNode = doGetJson(
+        val result: JsonNode = HttpUtil.doGetJson(
             "https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_cn" ,
-            header = HeadersUtil.getBasicHeaders(cookie), isDefault = false
+            header = HeadersUtil.getBasicHeaders(cookie)
         )
         val retcode: Int = result.get("retcode").asInt()
         if (retcode == SignConstant.RECODE3) {

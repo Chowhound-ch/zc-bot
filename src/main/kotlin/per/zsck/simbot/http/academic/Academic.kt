@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component
 import per.zsck.simbot.common.logError
 import per.zsck.simbot.common.logInfo
 import per.zsck.custom.util.http.HttpBase
+import per.zsck.custom.util.jackson.JacksonUtil
 import per.zsck.simbot.http.academic.entity.ClassMap
 import per.zsck.simbot.http.academic.entity.Schedule
 import per.zsck.simbot.http.academic.service.ClassMapService
@@ -55,7 +56,7 @@ class Academic(
 
 
                 val entity = StringEntity(
-                    objectMapper.writeValueAsString(
+                    JacksonUtil.toJsonString(
                         mutableMapOf(Pair("username", userName), Pair("password", encode), Pair("captcha", ""))
                     ), "UTF-8"
                 )
@@ -68,7 +69,7 @@ class Academic(
 
                 //再次请求，根据lessonIds请求得到具体lesson信息
                 val entityForRes = StringEntity(
-                    objectMapper.writeValueAsString(
+                    JacksonUtil.toJsonString(
                         mutableMapOf(Pair("lessonIds", lessonIds), Pair("studentId", 152113), Pair("weekIndex", ""))
                     ), "UTF-8"
                 )
@@ -81,7 +82,7 @@ class Academic(
                     val scheduleList = ArrayList<Schedule>().apply {
                         lessonsRes["result"]["scheduleList"].forEach { res: JsonNode ->
                             try {
-                                val schedule: Schedule = objectMapper.readValue(res.toString(), Schedule::class.java)
+                                val schedule: Schedule = JacksonUtil.readValue(res.toString(), Schedule::class.java)
                                 schedule.room = res["room"]["nameZh"].asText()
                                 this.add(schedule)
                             } catch (e: JsonProcessingException) {

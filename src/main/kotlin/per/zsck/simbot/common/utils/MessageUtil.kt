@@ -1,9 +1,6 @@
 package per.zsck.simbot.common.utils
 
-import love.forte.simbot.event.Event
 import love.forte.simbot.event.GroupEvent
-import love.forte.simbot.event.GroupMessageEvent
-import love.forte.simbot.event.MessageEvent
 
 /**
  * @author zsck

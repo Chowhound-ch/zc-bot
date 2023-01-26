@@ -4,6 +4,7 @@ import per.zsck.custom.util.http.HttpBase
 import cn.hutool.core.net.URLEncodeUtil
 import cn.hutool.core.util.ReUtil
 import org.springframework.stereotype.Component
+import per.zsck.custom.util.jackson.JacksonUtil
 import per.zsck.simbot.common.logWarn
 import per.zsck.simbot.http.kugou.entity.Music
 import per.zsck.simbot.http.kugou.entity.MusicRes
@@ -35,10 +36,10 @@ class KuGouMusic: HttpBase() {
     fun getSearchRes(keyWord: String?, number: Int = 5): MutableList<Music> {
         try {
             val searchResStr = ReUtil.get("\\((.+)\\)", doGetStr(encoding(keyWord!!)), 1)
-            val searchResJson = objectMapper.readTree(searchResStr)
+            val searchResJson = JacksonUtil.readTree(searchResStr)
 
             //默认取搜索结果前number歌，searchResJsonObj.optJSONObject("data").optJSONArray("lists") 为所有搜索结果
-            val list  = objectMapper.readValue(searchResJson["data"]["lists"].toString(), Array<Music>::class.java)
+            val list  = JacksonUtil.readValue(searchResJson["data"]["lists"].toString(), Array<Music>::class.java)
 
             return list.toList().stream().limit(number.toLong()).peek {
                 it.audioName = it.audioName?.replace(Regex("</?em>"), "")
@@ -53,7 +54,7 @@ class KuGouMusic: HttpBase() {
         val urlForMusicDetail = "https://wwwapi.kugou.com/yy/index.php?r=play/getdata&callback=jQuery191033144701096575724_1660124702942&hash=$hash&dfid=3eyKKr1tAQle0EQs9n1ItnQV&appid=1014&mid=d30a3efc49071a50132e4b338f93aa0a&platid=4&album_id=$albumID&_=1660124702944"
         try {
             val detailRes = ReUtil.get("\\((.+)\\)", doGetStr(urlForMusicDetail), 1)
-            val musicRes: MusicRes = objectMapper.readValue(detailRes, MusicRes::class.java)
+            val musicRes: MusicRes = JacksonUtil.readValue(detailRes, MusicRes::class.java)
 
             musicRes.music ?: logWarn("获取歌曲url失败，错误的返回信息: {}", detailRes)
             return musicRes
