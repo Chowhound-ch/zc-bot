@@ -1,6 +1,7 @@
 package per.zsck.simbot.http.mihoyo.sign
 
 import org.apache.commons.codec.digest.DigestUtils
+import per.zsck.simbot.http.mihoyo.sign.SignConstant.MiHoYoBbsSalt
 import java.util.*
 
 /**
@@ -44,6 +45,6 @@ object HeaderParams{
     fun getDS(): String {
         val i = (System.currentTimeMillis() / 1000).toString() + ""
         val r = getRandomStr()
-        return createDS("z8DRIUjNDT7IT5IZXvrUAxyupA1peND9", i, r)
+        return createDS(MiHoYoBbsSalt, i, r)
     }
 }

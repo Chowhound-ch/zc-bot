@@ -1,14 +1,13 @@
 package per.zsck.simbot.http.kugou
 
+import per.zsck.custom.util.http.HttpBase
 import cn.hutool.core.net.URLEncodeUtil
 import cn.hutool.core.util.ReUtil
 import org.springframework.stereotype.Component
 import per.zsck.simbot.common.logWarn
-import per.zsck.simbot.common.utils.HttpBase
 import per.zsck.simbot.http.kugou.entity.Music
 import per.zsck.simbot.http.kugou.entity.MusicRes
 import java.io.IOException
-import javax.annotation.PostConstruct
 import kotlin.streams.toList
 
 /**

@@ -1,7 +1,7 @@
 package per.zsck.simbot.http.mihoyo.sign.utils
 
 
-import per.zsck.simbot.common.utils.HttpBase
+import per.zsck.custom.util.http.HttpBase
 import per.zsck.simbot.http.mihoyo.sign.SignConstant
 import per.zsck.simbot.http.mihoyo.sign.entity.GenshinInfo
 

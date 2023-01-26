@@ -18,7 +18,7 @@ object SignConstant {
      * 切勿乱修改
      * 米游社版本
      */
-    const val APP_VERSION = "2.36.1"
+    const val APP_VERSION = "2.41.1"
 
     /**
      * 服务id
@@ -58,6 +58,7 @@ object SignConstant {
 
     const val LIST_URL = "https://api-takumi.mihoyo.com/event/bbs_sign_reward/home"
 
+    const val MiHoYoBbsSalt = "TsmyHpZg8gFAVKTtlPaL6YwMldzxZJxQ"
 
     /**
      * 错误或未登录

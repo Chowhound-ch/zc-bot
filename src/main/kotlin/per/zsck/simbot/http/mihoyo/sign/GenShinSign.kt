@@ -7,10 +7,10 @@ import love.forte.simbot.resources.URLResource
 import org.apache.http.entity.StringEntity
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import per.zsck.custom.util.http.HttpBase
 import per.zsck.simbot.common.logError
 import per.zsck.simbot.common.logInfo
 import per.zsck.simbot.common.logWarn
-import per.zsck.simbot.common.utils.HttpBase
 import per.zsck.simbot.http.mihoyo.sign.entity.Award
 import per.zsck.simbot.http.mihoyo.sign.entity.GenshinInfo
 import per.zsck.simbot.http.mihoyo.sign.entity.SignDetail

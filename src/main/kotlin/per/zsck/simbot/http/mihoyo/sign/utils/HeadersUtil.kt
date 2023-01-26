@@ -53,7 +53,7 @@ object HeadersUtil {
         )
             .add("Content-Type", "application/json;charset=UTF-8")
             .add("x-rpc-client_type", "2")
-            .add("x-rpc-app_version", "2.34.1")
+            .add("x-rpc-app_version", SignConstant.APP_VERSION)
             .add("DS", HeaderParams.getDS())
             .addAll(getBasicHeaders(cookie)).build()
     }

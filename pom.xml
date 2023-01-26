@@ -20,6 +20,11 @@
         <simbot-component-mirai.version>3.0.0.0-beta.2</simbot-component-mirai.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>per.zsck.util</groupId>
+            <artifactId>custom-util</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -115,6 +115,5 @@ class KuGouListener(
             MusicShare(MusicKind.KugouMusic, music.title!!, music.audioName!!, music.url!!,
                 music.imgUrl!!, music.url!!).asSimbotMessage()
         }catch (_: NullPointerException){ null }
-
     }
 }

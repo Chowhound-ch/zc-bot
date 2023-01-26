@@ -1,8 +1,8 @@
 package per.zsck.simbot.http.image
 
+import per.zsck.custom.util.http.HttpBase
 import com.fasterxml.jackson.databind.node.ArrayNode
 import org.springframework.stereotype.Component
-import per.zsck.simbot.common.utils.HttpBase
 
 /**
  * @author zsck

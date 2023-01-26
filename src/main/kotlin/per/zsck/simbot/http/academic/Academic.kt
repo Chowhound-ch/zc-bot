@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import per.zsck.simbot.common.logError
 import per.zsck.simbot.common.logInfo
-import per.zsck.simbot.common.utils.HttpBase
+import per.zsck.custom.util.http.HttpBase
 import per.zsck.simbot.http.academic.entity.ClassMap
 import per.zsck.simbot.http.academic.entity.Schedule
 import per.zsck.simbot.http.academic.service.ClassMapService
