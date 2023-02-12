@@ -1,0 +1,35 @@
+{
+  "properties": [
+    {
+      "name": "zsck.permit.is-init",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "Description for zsck.permit.is-init."
+    },
+    {
+      "name": "zsck.permit.owner",
+      "type": "java.lang.String",
+      "description": "Description for zsck.permit.owner."
+    },
+    {
+      "name": "zsck.default-uid",
+      "type": "java.lang.String",
+      "description": "Description for zsck.default-uid."
+    },
+    {
+      "name": "zsck.academic.user-name",
+      "type": "java.lang.String",
+      "description": "Description for zsck.academic.user-name."
+    },
+    {
+      "name": "zsck.academic.password",
+      "type": "java.lang.String",
+      "description": "Description for zsck.academic.password."
+    },
+    {
+      "name": "zsck.kugou.enable-local",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "Description for zsck.kugou.enable-local."
+    }
+  ] }

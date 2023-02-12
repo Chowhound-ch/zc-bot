@@ -1,0 +1,20 @@
+{
+  "app":"com.tencent.miniapp",
+  "desc":"",
+  "view":"notification",
+  "ver":"0.0.0.1",
+  "prompt":"该群已获得无忧认证",
+  "meta":{
+    "notification":{
+      "appInfo":{
+        "appName":"炼铜大师无忧官方通知",
+        "appType":4,
+        "appid":2034149631,
+        "iconUrl":"http://gchat.qpic.cn/gchatpic_new/825352674/811545265-2335848638-F7920D5FC4DC172EB094E7A6B4D0F39E/0?term=3&is_origin=0"},
+      "data":[{
+        "title":"通知内容",
+        "value":"本群炼铜氛围浓厚，获得无忧官方的认可\n\n\n炼铜大师无忧认证\n2023年02月12日"}],
+      "emphasis_keyword":""
+    }
+  }
+}

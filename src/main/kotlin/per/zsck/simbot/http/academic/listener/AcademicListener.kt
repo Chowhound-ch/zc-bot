@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUnit
 import cn.hutool.core.date.DateUtil
 import love.forte.simboot.annotation.Filter
 import love.forte.simboot.annotation.FilterValue
+import love.forte.simbot.event.FriendMessageEvent
 import love.forte.simbot.event.GroupMessageEvent
 import love.forte.simbot.event.MessageEvent
 import org.springframework.stereotype.Component
@@ -35,8 +36,8 @@ class AcademicListener(
 ){
 
     @RobotListen(stateLeast = GroupStateEnum.OPENED_ALL)
-    @Filter("/?{{index,\\d{1,2}}}")
-    suspend fun MessageEvent.viewWeek(@FilterValue("index")index: Long ){
+    @Filter("{{index,\\d{1,2}}}")
+    suspend fun FriendMessageEvent.viewWeek(@FilterValue("index")index: Long ){
 
 
         scheduleService.getLessonsByWeek(index).let { schedule ->
@@ -45,8 +46,8 @@ class AcademicListener(
     }
 
     @RobotListen(stateLeast = GroupStateEnum.OPENED_ALL)
-    @Filter("/?(w|W){{param,(\\+|-|=)?}}")
-    suspend fun MessageEvent.week(@FilterValue("param")param: String){
+    @Filter("(w|W){{param,(\\+|-|=)?}}")
+    suspend fun FriendMessageEvent.week(@FilterValue("param")param: String){
         val firstDate = scheduleService.getFirstDate()
         val date = Date.valueOf(DateUtil.today())
         val standard = getBalanceByParam(param)
@@ -74,8 +75,8 @@ class AcademicListener(
     }
 
     @RobotListen(stateLeast = GroupStateEnum.OPENED_ALL)
-    @Filter("/?(d|D){{param,(\\+|-|=)?}}")
-    suspend fun MessageEvent.day(@FilterValue("param")param: String){
+    @Filter("(d|D){{param,(\\+|-|=)?}}")
+    suspend fun FriendMessageEvent.day(@FilterValue("param")param: String){
         val firstDate = scheduleService.getFirstDate()
         val standard = getBalanceByParam(param)
         val date = standard.getDateIfDay()
@@ -96,8 +97,8 @@ class AcademicListener(
         }
     }
     @RobotListen(stateLeast = GroupStateEnum.OPENED_ALL)
-    @Filter("/?(f|F)\\s*{{name}}")
-    suspend fun MessageEvent.find(@FilterValue("name")name: String){
+    @Filter("(f|F)\\s*{{name}}")
+    suspend fun FriendMessageEvent.find(@FilterValue("name")name: String){
         val classMapList = classMapService.likeClassName(name)
 
         if (classMapList.isEmpty()){
@@ -125,8 +126,8 @@ class AcademicListener(
     }
 
     @RobotListen(permission = Permit.HOST, stateLeast = GroupStateEnum.OPENED_ALL )
-    @Filter("/?刷新课表")
-    suspend fun MessageEvent.refreshSchedule() = reply( academic.refresh() )
+    @Filter("刷新课表")
+    suspend fun FriendMessageEvent.refreshSchedule() = reply( academic.refresh() )
 
 
     fun getBalanceByParam(param: String): Standard {

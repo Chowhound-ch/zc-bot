@@ -32,6 +32,7 @@ class MessageAspect(
         val event = args.find { it is Event } ?: return proceed()
         val start = System.currentTimeMillis()
 
+
         fun proceedSuccess(group: String = "好友消息"): Any? {
             logInfo("执行了监听器{}({})(群: {}), 拦截器耗时: {}"
             ,signature.name, annotation.desc, group, System.currentTimeMillis() - start)
@@ -53,10 +54,7 @@ class MessageAspect(
             val group = runBlocking { event.group() }
             val author = runBlocking { event.author() }
 
-            if( !event.messageContent.plainText.startsWith("/") ){
-                logInfo("不是以/开头的群聊指令，已自动过滤")
-                return proceedFailed(group = group.id.toString())
-            }
+
 
 
             // 判断是否有权限

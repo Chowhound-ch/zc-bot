@@ -29,7 +29,7 @@ build/
 
 ### VS Code ###
 .vscode/
-*.json
+device.json
 *.bot
 *.bo
 application-*.yml
