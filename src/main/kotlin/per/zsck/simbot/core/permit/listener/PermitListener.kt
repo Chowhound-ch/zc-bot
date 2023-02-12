@@ -3,7 +3,6 @@ package per.zsck.simbot.core.permit.listener
 import love.forte.simboot.annotation.Filter
 import love.forte.simboot.annotation.FilterValue
 import love.forte.simboot.filter.MatchType
-import love.forte.simbot.action.sendIfSupport
 import love.forte.simbot.event.EventResult
 import love.forte.simbot.event.GroupMessageEvent
 import love.forte.simbot.message.At
@@ -35,13 +34,17 @@ class PermitListener (
         messageContent.messages[1].let {
             if (it is At){
                 val target = it.target.toString()
-                if (permitDetailService.setPermit(target, permit)) {
-                    sendIfSupport("成功将${target}权限设置为${desPermit}")
-                }else{
-                    sendIfSupport("设置失败,${target}的权限已是${desPermit}")
+                this.group().apply {
+                    if (permitDetailService.setPermit(target, permit)) {
+                        send("成功将${target}权限设置为${desPermit}")
+                    }else{
+                        send("设置失败,${target}的权限已是${desPermit}")
+                    }
                 }
+
             }
         }
+
 
         return EventResult.truncate()
     }

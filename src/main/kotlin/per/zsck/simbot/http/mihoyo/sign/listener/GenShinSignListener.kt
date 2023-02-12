@@ -6,7 +6,6 @@ import kotlinx.coroutines.withTimeout
 import love.forte.simboot.annotation.Filter
 import love.forte.simbot.ExperimentalSimbotApi
 import love.forte.simbot.Timestamp
-import love.forte.simbot.action.sendIfSupport
 import love.forte.simbot.component.mirai.message.MiraiForwardMessageBuilder
 import love.forte.simbot.event.*
 import love.forte.simbot.message.*
@@ -36,6 +35,7 @@ class GenShinSignListener(
     @Filter("/签到")
     suspend fun GroupMessageEvent.genshinSign(){
         val author = author()
+        val group = this.group()
 
         MiraiForwardMessageBuilder().apply {
             genshinInfoService.getGenshinInfoList(author.id.toString()).let {
@@ -53,9 +53,9 @@ class GenShinSignListener(
                 if ( it.isNotEmpty() ){
                     this.displayStrategy = GenshinSignDisplayStrategy
 
-                    sendIfSupport(this.build())
+                    group.send(this.build())
                 }else{
-                    sendIfSupport( buildMessages {
+                    group.send( buildMessages {
                         this.append( At(author.id) ).append( " 你当前尚未绑定原神账号哦" )
                     } )
                 }
@@ -72,12 +72,12 @@ class GenShinSignListener(
 
         val author = author()
 
-        sendIfSupport( buildMessages {
+        group.send( buildMessages {
             + At(author.id)
             + "请在私聊中完成后续操作"
         } )
 
-        author.sendIfSupport("请发送需要绑定的原神账号的cookie")
+        author.send("请发送需要绑定的原神账号的cookie")
 
         val nextMessage = try {
             withTimeout(120.seconds){
@@ -86,7 +86,7 @@ class GenShinSignListener(
 
             }
         }catch (e: TimeoutCancellationException){
-            author.sendIfSupport("会话因超时(120s)自动关闭")
+            author.send("会话因超时(120s)自动关闭")
             return EventResult.invalid()
         }
 
@@ -96,8 +96,8 @@ class GenShinSignListener(
         if (genshinInfos.isNotEmpty() ){
             val desInfo = if (genshinInfos.size == 1){  genshinInfos[0]  }else{
                 //cookie获取的原神账号信息不唯一,需要进一步确认
-                author.sendIfSupport("cookie对应的原神账号如下,请发送需要绑定的原神账号的uid")
-                author.sendIfSupport(MessagesBuilder().apply { //发送提示信息,列出可选uid
+                author.send("cookie对应的原神账号如下,请发送需要绑定的原神账号的uid")
+                author.send(MessagesBuilder().apply { //发送提示信息,列出可选uid
                     genshinInfos.forEach{
                         this.append("uid: ${it.uid}, 昵称: ${it.nickName}\n")
                 } }.build())
@@ -115,13 +115,13 @@ class GenShinSignListener(
                                 //输入的uid必须有对应的info在genshinInfos中,find结果不为null则push,否则提醒用户重新输入
                                 genshinInfos.find { info -> info.uid == provideUid }?.apply {
                                         provider.push(this)
-                                } ?: author.sendIfSupport("cookie中并不包含指定的原神账号(uid: ${provideUid})的信息,请重新输入")
+                                } ?: author.send("cookie中并不包含指定的原神账号(uid: ${provideUid})的信息,请重新输入")
 
                             }
                         }
                     }
                 }catch (e: TimeoutCancellationException){
-                    author.sendIfSupport("会话因超时(120s)自动关闭")
+                    author.send("会话因超时(120s)自动关闭")
                     return EventResult.invalid()
                 }
             }
@@ -129,12 +129,12 @@ class GenShinSignListener(
             if (genshinInfoService.saveGenshinInfo(desInfo, author.id.toString())){
 
                 logInfo("用户[{}] 与原神账号[uid: {}]成功绑定", author.id, desInfo.uid)
-                author.sendIfSupport("成功绑定原神账号\n uid: ${desInfo.uid}\n 昵称: ${desInfo.nickName}")
+                author.send("成功绑定原神账号\n uid: ${desInfo.uid}\n 昵称: ${desInfo.nickName}")
 
             }
 
         }else{//无法从cookie中获取原神账号信息
-            author.sendIfSupport("无法从cookie中获取原神账号信息,请确认cookie有效性")
+            author.send("无法从cookie中获取原神账号信息,请确认cookie有效性")
         }
 
         return EventResult.truncate()
@@ -145,8 +145,9 @@ class GenShinSignListener(
     @Filter("/解绑原神账号")
     suspend fun GroupMessageEvent.unbindGenshin(sessionContext: ContinuousSessionContext ): EventResult{
         val author = author()
+        val group = this.group()
 
-        sendIfSupport( buildMessages {
+        group.send( buildMessages {
             + At(author.id)
             + "请在私聊中完成后续操作"
         })
@@ -155,13 +156,13 @@ class GenShinSignListener(
 
         if (genshinInfoList.isNotEmpty()){
 
-            author.sendIfSupport(MessagesBuilder().apply {
+            author.send(MessagesBuilder().apply {
 
                 genshinInfoList.forEach { this.append("uid: ${it.uid}, 昵称: ${it.nickName}\n") }
 
             }.build())
 
-            author.sendIfSupport("请发送需要解绑的原神账号的uid")
+            author.send("请发送需要解绑的原神账号的uid")
             val desUid = try {
                 withTimeout(120.seconds){
 
@@ -171,7 +172,7 @@ class GenShinSignListener(
 
                             //genshinInfoList中有uid相同的账号才可
                             return@waitingForNextMessage genshinInfoList.contains( GenshinInfo(provideUid) ).apply {
-                                if (!this)  author.sendIfSupport("该账号尚未绑定uid为 $provideUid 的原神账号")
+                                if (!this)  author.send("该账号尚未绑定uid为 $provideUid 的原神账号")
                             }
                         }
                         return@waitingForNextMessage false
@@ -179,19 +180,19 @@ class GenShinSignListener(
 
                 }
             }catch (e: TimeoutCancellationException){
-                author.sendIfSupport("会话因超时(120s)自动关闭")
+                author.send("会话因超时(120s)自动关闭")
                 return EventResult.invalid()
             }
 
             if ( genshinInfoService.removeGenshinInfo(desUid) ){
-                author.sendIfSupport("成功于账号 uid: $desUid 解除绑定")
+                author.send("成功于账号 uid: $desUid 解除绑定")
 
                 logInfo("用户[{}] 与原神账号[uid: {}]解除绑定", author.id.toString(), desUid)
             }
 
         }else{
 
-            author.sendIfSupport("当前尚未绑定原神账号")
+            author.send("当前尚未绑定原神账号")
         }
 
         return EventResult.truncate()

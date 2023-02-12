@@ -5,7 +5,6 @@ import kotlinx.coroutines.withTimeout
 import love.forte.simboot.annotation.Filter
 import love.forte.simboot.annotation.FilterValue
 import love.forte.simbot.ExperimentalSimbotApi
-import love.forte.simbot.action.sendIfSupport
 import love.forte.simbot.component.mirai.message.asSimbotMessage
 import love.forte.simbot.event.*
 import love.forte.simbot.message.Message
@@ -39,13 +38,14 @@ class KuGouListener(
                                                sessionContext: ContinuousSessionContext): EventResult{
 
         val author = author()
+        val group = this.group()
 
         val searchRes = kuGouMusic.getSearchRes(keyword, if (param.isNotEmpty()) 8 else 1)
         lateinit var  desMusic: Music
 
         when (searchRes.size) {
             0 -> {
-                sendIfSupport("未找到关键字为 $keyword 的歌曲")
+                group.send("未找到关键字为 $keyword 的歌曲")
                 return EventResult.truncate()
             }
             1 -> {//如果目标音乐只有一首则直接分享该音乐
@@ -55,7 +55,7 @@ class KuGouListener(
             }
             else -> {
 
-                sendIfSupport(buildMessages {
+                group.send(buildMessages {
                     for ( i in 0 until  searchRes.size) {
                         searchRes[i].let {
                             this.append("${i + 1} 、")
@@ -78,7 +78,7 @@ class KuGouListener(
                         }
                     }
                 }catch (e: TimeoutCancellationException){
-                    sendIfSupport("会话因超时(120s)自动关闭")
+                    group.send("会话因超时(120s)自动关闭")
                     return EventResult.invalid()
                 }
                 desMusic = searchRes[desIndex.plainText.toInt() - 1]
@@ -86,7 +86,7 @@ class KuGouListener(
             }
         }
 
-        sendIfSupport(
+        group.send(
             desMusic.let {
 
                 if (it.url == null && it.fileHash != null){//如果该音乐不是从本地找到的则从网络获取
@@ -106,7 +106,7 @@ class KuGouListener(
     @RobotListen
     @Filter("^/上传歌曲")
     suspend fun GroupMessageEvent.uploadMusic(){
-        sendIfSupport("请访问网站")
+        group.send("请访问网站")
     }
 
 

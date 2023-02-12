@@ -3,9 +3,7 @@ package per.zsck.simbot.http.mihoyo.sign.timing
 import kotlinx.coroutines.runBlocking
 import love.forte.simbot.ID
 import love.forte.simbot.Timestamp
-import love.forte.simbot.action.sendIfSupport
 import love.forte.simbot.component.mirai.message.MiraiForwardMessageBuilder
-import okhttp3.internal.wait
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -45,7 +43,7 @@ class SignTask (
         }
         groupStateCache.getGroupsWithState(GroupStateEnum.OPENED_ALL).forEach {
 
-            runBlocking { miraiBot.group( it.ID )?.sendIfSupport(msg.build()) }
+            runBlocking { miraiBot.group( it.ID )?.send(msg.build()) }
 
         }
 

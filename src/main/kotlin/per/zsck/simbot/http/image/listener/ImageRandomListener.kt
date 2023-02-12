@@ -2,14 +2,11 @@ package per.zsck.simbot.http.image.listener
 
 import love.forte.simboot.annotation.Filter
 import love.forte.simboot.annotation.FilterValue
-import love.forte.simbot.action.sendIfSupport
 import love.forte.simbot.component.mirai.message.buildMiraiForwardMessage
 import love.forte.simbot.event.EventResult
 import love.forte.simbot.event.GroupMessageEvent
 import love.forte.simbot.message.buildMessages
-import love.forte.simbot.resources.ByteArrayResource
 import love.forte.simbot.resources.URLResource
-
 import org.springframework.stereotype.Controller
 import per.zsck.simbot.common.annotation.RobotListen
 import per.zsck.simbot.http.image.ImageRandom
@@ -30,20 +27,20 @@ class ImageRandomListener(
         @FilterValue("number")number: String
     ): EventResult{
         val desNum = if (number == "") 1 else number.toInt()
-
+        val group = this.group()
         if (desNum > 50){
-            sendIfSupport("数量太多啦,请调整数量后再尝试")
+            group.send("数量太多啦,请调整数量后再尝试")
             return EventResult.truncate()
         }else{
             if ( desNum > 10 ){
-                sendIfSupport("单次请求的图片较多，请耐心等待")
+                group.send("单次请求的图片较多，请耐心等待")
             }
 
             val imageUrlList = imageRandom.getImageUrlList(desNum)
 
             val author = author()
 
-            sendIfSupport(buildMiraiForwardMessage {
+            group.send(buildMiraiForwardMessage {
                 imageUrlList.forEach {
 
                     this.add(author.id, author.nickname,   buildMessages { this.image( URLResource(URL(it.asText()))) } )

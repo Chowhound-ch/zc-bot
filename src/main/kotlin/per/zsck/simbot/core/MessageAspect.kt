@@ -2,7 +2,6 @@ package per.zsck.simbot.core
 
 import kotlinx.coroutines.runBlocking
 import love.forte.simbot.ID
-import love.forte.simbot.action.sendIfSupport
 import love.forte.simbot.event.Event
 import love.forte.simbot.event.GroupMessageEvent
 import org.aspectj.lang.ProceedingJoinPoint
@@ -44,7 +43,7 @@ class MessageAspect(
             logInfo("执行监听器{}({})(群: {}) 失败 : {}", signature.name, annotation.desc, group, tip ?: "无")
 
             runBlocking { tip?.let {
-                miraiBot.group(group.ID)?.sendIfSupport(it)
+                miraiBot.group(group.ID)?.send(it)
             } }
 
         }

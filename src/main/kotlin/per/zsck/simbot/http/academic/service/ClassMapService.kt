@@ -23,6 +23,7 @@ class ClassMapServiceImpl: ClassMapService, ServiceImpl<ClassMapMapper, ClassMap
     }
 
     override fun likeClassName(name: String): List<ClassMap> {
+        val like = KtQueryWrapper(ClassMap::class.java).like(ClassMap::className, name)
         return list(KtQueryWrapper(ClassMap::class.java).like(ClassMap::className, name))
     }
 }

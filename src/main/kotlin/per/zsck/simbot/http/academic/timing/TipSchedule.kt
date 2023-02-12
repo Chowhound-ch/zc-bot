@@ -4,9 +4,7 @@ import cn.hutool.core.date.DateUnit
 import cn.hutool.core.date.DateUtil
 import kotlinx.coroutines.runBlocking
 import love.forte.simbot.ID
-import love.forte.simbot.action.sendIfSupport
 import love.forte.simbot.message.Message
-import love.forte.simbot.message.MessageContent
 import love.forte.simbot.message.Text
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Async
@@ -84,7 +82,7 @@ class TipSchedule  (
                 }
             }
             miraiBot.friend(botHost.ID)?.apply {
-                messageList.forEach { sendIfSupport( it ) }
+                messageList.forEach { send( it ) }
             }
 
             pushMsgToGroupList(messageList, groupStateService.getGroupListEnableLessonPush(GroupStateConstant.LESSON_PUSH))
@@ -114,7 +112,7 @@ class TipSchedule  (
                     }
                 }
                 miraiBot.friend(botHost.ID)?.apply {
-                    messageList.forEach { sendIfSupport( it ) }
+                    messageList.forEach { send( it ) }
                 }
                 pushMsgToGroupList(messageList, groupStateService.getGroupListEnableLessonPush(GroupStateConstant.LESSON_PUSH))
             }
@@ -127,7 +125,7 @@ class TipSchedule  (
             groupList.forEach { it ->
                 it.groupNumber?.let { groupNumber ->
                     miraiBot.group(groupNumber.ID)?.apply { //获取每个开启推送的群
-                        msgList.forEach { msg -> sendIfSupport(msg) }//发送推送消息
+                        msgList.forEach { msg -> send(msg) }//发送推送消息
                     }
                 }
             }

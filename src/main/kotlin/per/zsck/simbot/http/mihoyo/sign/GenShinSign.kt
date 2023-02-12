@@ -6,6 +6,7 @@ import love.forte.simbot.message.MessagesBuilder
 import love.forte.simbot.resources.URLResource
 import org.apache.http.entity.StringEntity
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.DependsOn
 import org.springframework.stereotype.Component
 import per.zsck.custom.util.http.HttpUtil
 import per.zsck.custom.util.jackson.JacksonUtil

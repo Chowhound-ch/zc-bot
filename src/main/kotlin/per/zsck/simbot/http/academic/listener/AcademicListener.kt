@@ -4,8 +4,6 @@ import cn.hutool.core.date.DateUnit
 import cn.hutool.core.date.DateUtil
 import love.forte.simboot.annotation.Filter
 import love.forte.simboot.annotation.FilterValue
-import love.forte.simbot.action.sendIfSupport
-import love.forte.simbot.event.FriendMessageEvent
 import love.forte.simbot.event.GroupMessageEvent
 import love.forte.simbot.event.MessageEvent
 import org.springframework.stereotype.Component
@@ -40,8 +38,9 @@ class AcademicListener(
     @Filter("/?{{index,\\d{1,2}}}")
     suspend fun MessageEvent.viewWeek(@FilterValue("index")index: Long ){
 
-        scheduleService.getLessonsByWeek(index).apply {
-            academicUtil.getCourseDetailMsg(this).forEach { sendIfSupport(it) }
+
+        scheduleService.getLessonsByWeek(index).let { schedule ->
+            academicUtil.getCourseDetailMsg(schedule).forEach { reply(it) }
         }
     }
 
@@ -55,21 +54,21 @@ class AcademicListener(
         val gap: Long = DateUtil.between(firstDate, date, DateUnit.WEEK, false) + standard.value
 
         if (gap >= 0) {
-            sendIfSupport("${standard.week} 为第 $gap 周")
+            reply("${standard.week} 为第 $gap 周")
         } else {
-            sendIfSupport("${standard.week} 尚未开学,距离开学还有 ${DateUtil.between(
+            reply("${standard.week} 尚未开学,距离开学还有 ${DateUtil.between(
                 date, firstDate, DateUnit.DAY, true)} 天")
             return
         }
 
         val scheduleList = scheduleService.getLessonsByWeek(gap)
         if (scheduleList.isEmpty()){
-            sendIfSupport("${standard.week} 无课程")
+            reply("${standard.week} 无课程")
             return
         }
 
         academicUtil.getCourseDetailMsg(scheduleList).forEach{
-            sendIfSupport(it)
+            reply(it)
         }
 
     }
@@ -82,17 +81,17 @@ class AcademicListener(
         val date = standard.getDateIfDay()
 
         if (date.before(firstDate)) {
-            sendIfSupport("该日正处于假期，距离开学:${DateUtil.between(date, firstDate, DateUnit.DAY, true)}天")
+            reply("该日正处于假期，距离开学:${DateUtil.between(date, firstDate, DateUnit.DAY, true)}天")
         } else {
             val gap = DateUtil.between(firstDate, date, DateUnit.DAY, true)
             val scheduleList = scheduleService.getLessonsByDate(date)
-            sendIfSupport("${standard.day} 日期: $date ,属于第 ${gap / 7 + 1} 周")
+            reply("${standard.day} 日期: $date ,属于第 ${gap / 7 + 1} 周")
             if (scheduleList.isEmpty()) {
-                sendIfSupport("当日无课程")
+                reply("当日无课程")
                 return
             }
             academicUtil.getCourseDetailMsg(scheduleList).forEach {
-                sendIfSupport(it)
+                reply(it)
             }
         }
     }
@@ -102,12 +101,12 @@ class AcademicListener(
         val classMapList = classMapService.likeClassName(name)
 
         if (classMapList.isEmpty()){
-            sendIfSupport("未查询到符合条件的信息")
+            reply("未查询到符合条件的信息")
         }else{
             for (classMap in classMapList) {
                 val classDetail = scheduleService.getClassDetail(classMap.id!!)
 
-                sendIfSupport(academicUtil.getLessonInfoMsg(classMap, classDetail))
+                reply(academicUtil.getLessonInfoMsg(classMap, classDetail))
             }
         }
     }
@@ -119,15 +118,15 @@ class AcademicListener(
         val groupNumber = groupNumber()
 
         if (groupStateService.setGroupLessonPush(groupNumber, desState)){
-            sendIfSupport("群${groupNumber}成功${desStateStr}课表推送")
+            reply("群${groupNumber}成功${desStateStr}课表推送")
         }else{
-            sendIfSupport("群${groupNumber}的课表推送功能已是${desStateStr}状态")
+            reply("群${groupNumber}的课表推送功能已是${desStateStr}状态")
         }
     }
 
     @RobotListen(permission = Permit.HOST, stateLeast = GroupStateEnum.OPENED_ALL )
     @Filter("/?刷新课表")
-    suspend fun MessageEvent.refreshSchedule() = sendIfSupport( academic.refresh() )
+    suspend fun MessageEvent.refreshSchedule() = reply( academic.refresh() )
 
 
     fun getBalanceByParam(param: String): Standard {
