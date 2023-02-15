@@ -65,7 +65,7 @@ class MessageAspect(
             }
             val groupState = groupStateService.getGroupState(group.id.toString())
             // 判断是否开机
-            if (groupState.state < annotation.stateLeast){
+            if (groupState.state!! < annotation.stateLeast){
 
                 return proceedFailed("当前群未开放此功能", group.id.toString()) //未开机则拦截
 

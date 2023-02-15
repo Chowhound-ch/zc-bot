@@ -1,5 +1,7 @@
 package per.zsck.simbot.core.state.entity
 
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Document
 import per.zsck.simbot.core.state.enums.CanHeartEnum
 import per.zsck.simbot.core.state.enums.GenshinSignPushEnum
 import per.zsck.simbot.core.state.enums.GroupStateEnum
@@ -10,15 +12,30 @@ import java.io.Serializable
  * @author zsck
  * @date   2022/11/5 - 11:14
  */
+@Document("group_state")
 data class GroupState(
-    var id: Long? = null,
+    @Id
+    var id: String? = null,
     var groupNumber: String? = null,
-    var state: GroupStateEnum = GroupStateEnum.CLOSED,
+    var state: GroupStateEnum? = GroupStateEnum.CLOSED,
 
-    var lessonPush: LessonPushEnum = LessonPushEnum.CLOSED,
-    var genshinSignPush: GenshinSignPushEnum = GenshinSignPushEnum.CLOSED,
-    var canHeart: CanHeartEnum = CanHeartEnum.CLOSED,
+    var lessonPush: LessonPushEnum? = LessonPushEnum.CLOSED,
+    var genshinSignPush: GenshinSignPushEnum? = GenshinSignPushEnum.CLOSED,
+    var canHeart: CanHeartEnum? = CanHeartEnum.CLOSED,
 ) :Serializable{
+
+//    constructor(groupNumber: String): this(null, groupNumber, null, null, null, null)
+
+    companion object {
+        fun of(groupNumber: String): GroupState {
+            return GroupState(null, groupNumber, null, null, null, null)
+        }
+
+        fun instance(): GroupState {
+            return GroupState(null, null, null, null, null, null)
+        }
+    }
+
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -6,7 +6,6 @@ import love.forte.simbot.message.MessagesBuilder
 import love.forte.simbot.resources.URLResource
 import org.apache.http.entity.StringEntity
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.DependsOn
 import org.springframework.stereotype.Component
 import per.zsck.custom.util.http.HttpUtil
 import per.zsck.custom.util.jackson.JacksonUtil
@@ -30,6 +29,7 @@ import kotlin.streams.toList
  * @author zsck
  * @date   2022/11/1 - 9:28
  */
+@Suppress("unused")
 @Component
 class GenShinSign(var genshinInfoService: GenshinInfoService){
     var awards: List<Award>? = null

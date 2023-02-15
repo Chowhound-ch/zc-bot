@@ -22,6 +22,7 @@ import per.zsck.simbot.core.state.service.GroupStateService
  * @author zsck
  * @date   2022/11/6 - 12:27
  */
+@Suppress("unused")
 @Component
 class GroupStateListener(
     val groupStateService: GroupStateService
@@ -37,7 +38,7 @@ class GroupStateListener(
         this.group().apply {
             val groupState = groupStateService.getGroupState(groupNumber)
 
-            if (groupState.state != desEnum) {
+            if (groupState!!.state != desEnum) {
                 groupState.state = desEnum!!
 
                 groupStateService.setGroupState(groupState)
