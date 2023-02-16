@@ -9,6 +9,7 @@ import love.forte.simbot.message.buildMessages
 import love.forte.simbot.resources.URLResource
 import org.springframework.stereotype.Controller
 import per.zsck.simbot.common.annotation.RobotListen
+import per.zsck.simbot.core.state.enums.ImageEnum
 import per.zsck.simbot.http.image.ImageRandom
 import java.net.URL
 
@@ -21,8 +22,8 @@ class ImageRandomListener(
     val imageRandom: ImageRandom
 ) {
 
-    @RobotListen
-    @Filter("/图片{{number,([1-9][0-9]?)?}}")
+    @RobotListen(boolEnumCondition = [ImageEnum::class])
+    @Filter("/来点好(看|康)的{{number,([1-9][0-9]?)?}}")
     suspend fun GroupMessageEvent.getRandomImage(
         @FilterValue("number")number: String
     ): EventResult{
