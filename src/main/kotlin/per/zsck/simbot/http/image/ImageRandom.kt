@@ -3,6 +3,8 @@ package per.zsck.simbot.http.image
 import per.zsck.custom.util.http.HttpBase
 import com.fasterxml.jackson.databind.node.ArrayNode
 import org.springframework.stereotype.Component
+import per.zsck.simbot.core.state.entity.GroupState
+import per.zsck.simbot.http.HttpProxy
 
 /**
  * @author zsck
@@ -10,7 +12,6 @@ import org.springframework.stereotype.Component
  */
 @Component
 class ImageRandom : HttpBase(){
-
 
     companion object{
 

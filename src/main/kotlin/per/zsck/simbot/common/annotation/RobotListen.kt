@@ -6,8 +6,8 @@ import love.forte.simbot.PriorityConstant
 import love.forte.simbot.event.GroupMessageEvent
 import org.springframework.core.annotation.AliasFor
 import per.zsck.simbot.core.permit.Permit
-import per.zsck.simbot.core.state.enums.GenshinSignPushEnum
 import per.zsck.simbot.core.state.enums.GroupStateEnum
+import kotlin.reflect.KClass
 
 /**
  * @author wuyou 、 zsck
@@ -42,6 +42,11 @@ annotation class RobotListen(
      */
     val stateLeast: GroupStateEnum = GroupStateEnum.NORMAL,
 
-    //
-    val boolEnumCondition: Array<String> = []
+    /**
+     * 额外的事件功能开关判断
+     */
+    vararg val boolEnumCondition: KClass<*>,
+
+    val memberMessageSupport: Boolean = true,
+
 )

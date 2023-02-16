@@ -12,12 +12,15 @@ zsck:
     index-url: ${custom.kugou.index-url}
   config:
     environment: dev
+  proxy:
+    addr: localhost
+    port: 7890
 
 
 
 logging:
   level:
-    per.zsck: info
+    per.zsck: debug
 
 spring:
   profiles:

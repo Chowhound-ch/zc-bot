@@ -1,7 +1,9 @@
-package per.zsck.simbot.http.image
+package per.zsck.simbot.http.image.api
 
 import cn.hutool.core.util.URLUtil
-import per.zsck.custom.util.http.HttpUtil
+import per.zsck.custom.util.jackson.JacksonUtil
+import per.zsck.simbot.http.HttpProxy
+import per.zsck.simbot.http.image.entity.ImageEntity
 
 /**
  * @author zsck
@@ -12,13 +14,14 @@ object PixivApi{
 
     private const val PIXIV_API = "https://api.lolicon.app/setu/v2"
 
-    fun getImage(tag: List<String>, r18: Boolean){
+    fun getImage(tag: List<String>, r18: Boolean): ImageEntity?{
         val url = getUrl(tag, r18)
 
-        val res = HttpUtil.doGetJson(url)
+        val res = HttpProxy.doGetJson(url)
 
-        res["data"]?.apply {
-
+         return res["data"]?.let {
+            val listValue = JacksonUtil.readListValue(JacksonUtil.toJsonString(it), ImageEntity::class.java)
+             if (listValue.isEmpty()) null else listValue[0]
         }
 
     }
@@ -34,6 +37,3 @@ object PixivApi{
 
 }
 
-fun main(){
-    PixivApi.getImage(arrayListOf("刻晴"), false)
-}

@@ -38,7 +38,7 @@ class GroupStateListener(
         this.group().apply {
             val groupState = groupStateService.getGroupState(groupNumber)
 
-            if (groupState!!.state != desEnum) {
+            if (groupState.state != desEnum) {
                 groupState.state = desEnum!!
 
                 groupStateService.setGroupState(groupState)

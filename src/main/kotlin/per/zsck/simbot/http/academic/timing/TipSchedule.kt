@@ -6,7 +6,6 @@ import kotlinx.coroutines.runBlocking
 import love.forte.simbot.ID
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.Text
-import net.mamoe.mirai.Bot
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -87,7 +86,7 @@ class TipSchedule  (
                 messageList.forEach { send( it ) }
             }
 
-            pushMsgToGroupList(messageList, groupStateService.list())
+            pushMsgToGroupList(messageList, groupStateService.getGroupStateByState(LessonPushEnum.NORMAL))
         }
 
     }

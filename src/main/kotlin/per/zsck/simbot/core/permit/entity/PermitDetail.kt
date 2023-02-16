@@ -11,7 +11,7 @@ data class PermitDetail(
     val qqNumber: String?,
     val permit: Permit
 ){
-    constructor(): this(null, null, Permit.MANAGER)
+    constructor(): this(null, null, Permit.MEMBER)
 
-    constructor(qqNumber: String?): this(null, qqNumber, Permit.MANAGER)
+    constructor(qqNumber: String?): this(null, qqNumber, Permit.MEMBER)
 }

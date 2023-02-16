@@ -93,3 +93,31 @@ enum class CanHeartEnum(
         return des
     }
 }
+
+@ValueEnumCache
+enum class ImageEnum(
+    @EnumValue
+    val value: Int,
+    private val des: String,
+){
+    CLOSED(0, "关闭涩图"),
+    NORMAL(1, "开启涩图");
+
+    override fun toString(): String {
+        return des
+    }
+}
+
+@ValueEnumCache
+enum class ImageR18Enum(
+    @EnumValue
+    val value: Int,
+    private val des: String,
+){
+    CLOSED(0, "关闭r18涩图"),
+    NORMAL(1, "开启r18涩图");
+
+    override fun toString(): String {
+        return des
+    }
+}

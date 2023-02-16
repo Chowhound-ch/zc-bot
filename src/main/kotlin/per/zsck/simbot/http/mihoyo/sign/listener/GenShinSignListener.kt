@@ -72,7 +72,7 @@ class GenShinSignListener(
 
         val author = author()
 
-        group.send( buildMessages {
+        group().send( buildMessages {
             + At(author.id)
             + "请在私聊中完成后续操作"
         } )

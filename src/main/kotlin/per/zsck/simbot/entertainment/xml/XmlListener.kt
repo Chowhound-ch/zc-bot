@@ -18,6 +18,8 @@ import net.mamoe.mirai.message.data.LightApp
 import org.springframework.stereotype.Component
 import per.zsck.custom.util.jackson.JacksonUtil
 import per.zsck.simbot.common.annotation.RobotListen
+import per.zsck.simbot.core.state.entity.GroupState
+import per.zsck.simbot.core.state.enums.CanHeartEnum
 import per.zsck.simbot.core.state.enums.EnumUtil
 import javax.annotation.PostConstruct
 
@@ -71,16 +73,16 @@ class XmlListener {
     }
 
 
-//    @RobotListen(boolEnumCondition = [EnumUtil.CanHeartEnum])
-//    @Filter("/can\\s*can\\s*heart")
-//    suspend fun GroupMessageEvent.canCanHeart() {
-//
-//        this.group().send(
-//            SimbotOriginalMiraiMessage(LightApp(
-//                "{\"app\":\"com.tencent.gamecenter.gameshare\",\"desc\":\"\",\"view\":\"noDataView\",\"ver\":\"0.0.0.0\",\"prompt\":\"让妲己看看你的心~\",\"appID\":\"\",\"sourceName\":\"\",\"actionData\":\"\",\"actionData_A\":\"\",\"sourceUrl\":\"\",\"meta\":{\"shareData\":{\"DATA10\":\"\",\"DATA13\":\"0\",\"DATA14\":\"videotest1\",\"jumpUrl\":\"http:\\/\\/game.gtimg.cn\\/images\\/yxzj\\/zlkdatasys\\/audios\\/audio\\/20220412\\/16497568317400.wav\",\"scene\":\"SCENE_SHARE_VIDEO\",\"type\":\"video\",\"url\":\"http:\\/\\/game.gtimg.cn\\/images\\/yxzj\\/zlkdatasys\\/audios\\/audio\\/20220412\\/16497568317400.wav\"}},\"config\":{\"ctime\":1674022176,\"forward\":0,\"height\":-1000,\"token\":\"61fe0a996f85e161b98fb748ff6f1209\",\"type\":\"normal\",\"width\":-1000},\"text\":\"\",\"sourceAd\":\"\",\"extra\":\"\"}"
-//            ))
-//        )
-//    }
+    @RobotListen(boolEnumCondition = [CanHeartEnum::class])
+    @Filter("/can\\s*can\\s*heart")
+    suspend fun GroupMessageEvent.canCanHeart() {
+
+        this.group().send(
+            SimbotOriginalMiraiMessage(LightApp(
+                "{\"app\":\"com.tencent.gamecenter.gameshare\",\"desc\":\"\",\"view\":\"noDataView\",\"ver\":\"0.0.0.0\",\"prompt\":\"让妲己看看你的心~\",\"appID\":\"\",\"sourceName\":\"\",\"actionData\":\"\",\"actionData_A\":\"\",\"sourceUrl\":\"\",\"meta\":{\"shareData\":{\"DATA10\":\"\",\"DATA13\":\"0\",\"DATA14\":\"videotest1\",\"jumpUrl\":\"http:\\/\\/game.gtimg.cn\\/images\\/yxzj\\/zlkdatasys\\/audios\\/audio\\/20220412\\/16497568317400.wav\",\"scene\":\"SCENE_SHARE_VIDEO\",\"type\":\"video\",\"url\":\"http:\\/\\/game.gtimg.cn\\/images\\/yxzj\\/zlkdatasys\\/audios\\/audio\\/20220412\\/16497568317400.wav\"}},\"config\":{\"ctime\":1674022176,\"forward\":0,\"height\":-1000,\"token\":\"61fe0a996f85e161b98fb748ff6f1209\",\"type\":\"normal\",\"width\":-1000},\"text\":\"\",\"sourceAd\":\"\",\"extra\":\"\"}"
+            ))
+        )
+    }
 
 //    @RobotListen
 //    suspend fun GroupMessageEvent.canCanElse() {

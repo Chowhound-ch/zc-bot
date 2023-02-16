@@ -2,10 +2,7 @@ package per.zsck.simbot.core.state.entity
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import per.zsck.simbot.core.state.enums.CanHeartEnum
-import per.zsck.simbot.core.state.enums.GenshinSignPushEnum
-import per.zsck.simbot.core.state.enums.GroupStateEnum
-import per.zsck.simbot.core.state.enums.LessonPushEnum
+import per.zsck.simbot.core.state.enums.*
 import java.io.Serializable
 
 /**
@@ -22,20 +19,21 @@ data class GroupState(
     var lessonPush: LessonPushEnum? = LessonPushEnum.CLOSED,
     var genshinSignPush: GenshinSignPushEnum? = GenshinSignPushEnum.CLOSED,
     var canHeart: CanHeartEnum? = CanHeartEnum.CLOSED,
+    var image: ImageEnum? = ImageEnum.CLOSED,
+    var r: ImageR18Enum? = ImageR18Enum.CLOSED,
 ) :Serializable{
 
 //    constructor(groupNumber: String): this(null, groupNumber, null, null, null, null)
 
     companion object {
         fun of(groupNumber: String): GroupState {
-            return GroupState(null, groupNumber, null, null, null, null)
+            return GroupState(null, groupNumber, null, null, null, null, null, null)
         }
 
         fun instance(): GroupState {
-            return GroupState(null, null, null, null, null, null)
+            return GroupState(null, null, null, null, null, null, null, null)
         }
     }
-
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -48,16 +46,22 @@ data class GroupState(
         if (lessonPush != other.lessonPush) return false
         if (genshinSignPush != other.genshinSignPush) return false
         if (canHeart != other.canHeart) return false
+        if (image != other.image) return false
+        if (r != other.r) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = groupNumber?.hashCode() ?: 0
-        result = 31 * result + state.hashCode()
-        result = 31 * result + lessonPush.hashCode()
-        result = 31 * result + genshinSignPush.hashCode()
-        result = 31 * result + canHeart.hashCode()
+        result = 31 * result + (state?.hashCode() ?: 0)
+        result = 31 * result + (lessonPush?.hashCode() ?: 0)
+        result = 31 * result + (genshinSignPush?.hashCode() ?: 0)
+        result = 31 * result + (canHeart?.hashCode() ?: 0)
+        result = 31 * result + (image?.hashCode() ?: 0)
+        result = 31 * result + (r?.hashCode() ?: 0)
         return result
     }
+
+
 }
