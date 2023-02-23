@@ -1,45 +1,30 @@
 package per.zsck.simbot.core.state
 
-import org.springframework.stereotype.Component
+import cn.hutool.core.util.ClassUtil
 import per.zsck.simbot.core.state.entity.GroupState
-import per.zsck.simbot.core.state.service.GroupStateService
-import javax.annotation.PostConstruct
+import per.zsck.simbot.core.state.enums.EnumUtil
+import java.lang.reflect.Field
 
 /**
  * @author zsck
- * @date   2022/11/5 - 14:22
+ * @date   2023/2/13 - 18:11
  */
-@Component
-class GroupStateCache(
-    val groupStateService: GroupStateService
-) {
+object GroupStateCache {
+    val ENUM_MAP: MutableMap<Class<*>, Field> = HashMap()
 
-    companion object{
-        val STATE_MAP = mutableMapOf<String, GroupStateEnum>()
-    }
-    @PostConstruct
-    fun init(){
-        groupStateService.list().forEach{
-            groupState -> STATE_MAP[groupState.groupNumber!!] = groupState.state
-        }
-    }
-
-    fun setGroupState(group: String, stateEnum: GroupStateEnum): Boolean{
-        val state = STATE_MAP.computeIfAbsent(group) { return@computeIfAbsent GroupStateEnum.CLOSED }
-        return if (stateEnum == state){
-            false
-        }else{
-            STATE_MAP[group] = stateEnum
-            true
-        }
-    }
-
-    fun getGroupsWithState(stateEnum: GroupStateEnum): MutableList<String>{
-        return ArrayList<String>().apply {
-            STATE_MAP.forEach{
-                if (it.value == stateEnum){ this.add(it.key) }
+    init {
+        ClassUtil.getDeclaredFields(GroupState::class.java).forEach {
+            it.isAccessible = true
+            if (it.type.isEnum) {
+                ENUM_MAP[it.type] = it
             }
         }
     }
 
+    fun getClassByFieldName(name: String): Class<*>? = ENUM_MAP.firstNotNullOf { (clazz, field) ->
+        if (field.name.uppercase() == name.uppercase()) clazz else null
+    }
+
+
+    fun getByClass(clazz: Class<*>): Field = ENUM_MAP[clazz]!!
 }

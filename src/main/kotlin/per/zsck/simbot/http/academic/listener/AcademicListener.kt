@@ -6,13 +6,12 @@ import love.forte.simboot.annotation.Filter
 import love.forte.simboot.annotation.FilterValue
 import love.forte.simbot.event.FriendMessageEvent
 import love.forte.simbot.event.GroupMessageEvent
-import love.forte.simbot.event.MessageEvent
 import org.springframework.stereotype.Component
 import per.zsck.simbot.common.annotation.RobotListen
 import per.zsck.simbot.common.utils.MessageUtil.groupNumber
 import per.zsck.simbot.core.permit.Permit
-import per.zsck.simbot.core.state.GroupStateConstant
-import per.zsck.simbot.core.state.GroupStateEnum
+import per.zsck.simbot.core.state.enums.GroupStateEnum
+import per.zsck.simbot.core.state.enums.LessonPushEnum
 import per.zsck.simbot.core.state.service.GroupStateService
 import per.zsck.simbot.http.academic.Academic
 import per.zsck.simbot.http.academic.service.ClassMapService
@@ -25,7 +24,7 @@ import java.time.LocalDate
  * @author zsck
  * @date   2022/11/10 - 8:30
  */
-
+@Suppress("unused")
 @Component
 class AcademicListener(
     val scheduleService: ScheduleService,
@@ -114,11 +113,17 @@ class AcademicListener(
     @RobotListen(permission = Permit.HOST)
     @Filter("/{{desState,(开启|关闭)}}课表推送")
     suspend fun GroupMessageEvent.setAcademicPush(@FilterValue("desState")desStateStr: String){
-        val desState = if (desStateStr == "开启") { GroupStateConstant.LESSON_PUSH } else{ GroupStateConstant.UNABLE_LESSON_PUSH }
+        val desState = if (desStateStr == "开启") { LessonPushEnum.NORMAL } else{ LessonPushEnum.CLOSED }
 
         val groupNumber = groupNumber()
 
-        if (groupStateService.setGroupLessonPush(groupNumber, desState)){
+        val groupState = groupStateService.getGroupState(groupNumber)
+
+
+        if (groupState.lessonPush != desState){
+            groupState.lessonPush = desState
+            groupStateService.setGroupState(groupState)
+
             reply("群${groupNumber}成功${desStateStr}课表推送")
         }else{
             reply("群${groupNumber}的课表推送功能已是${desStateStr}状态")

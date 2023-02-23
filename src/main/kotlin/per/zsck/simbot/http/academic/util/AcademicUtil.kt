@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil
 import love.forte.simbot.message.Messages
 import love.forte.simbot.message.MessagesBuilder
 import org.springframework.stereotype.Component
+import per.zsck.simbot.core.config.EnvironmentConfig
 import per.zsck.simbot.http.academic.entity.ClassMap
 import per.zsck.simbot.http.academic.entity.Schedule
 import per.zsck.simbot.http.academic.service.ClassMapService
@@ -25,6 +26,11 @@ class AcademicUtil(
 
     @PostConstruct
     fun init(){
+        if (EnvironmentConfig.isDev()){
+            mutableClassMap = mutableMapOf()
+            return
+        }
+
         mutableClassMap = classMapService.list().stream().collect(Collectors.toMap({ item -> item.id}, ClassMap::className))
     }
 

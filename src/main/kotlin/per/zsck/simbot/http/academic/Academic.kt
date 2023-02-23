@@ -150,6 +150,6 @@ class Academic(
         const val GET_SALT = "http://jxglstu.hfut.edu.cn/eams5-student/login-salt"
         const val LOGIN_URL = "http://jxglstu.hfut.edu.cn/eams5-student/login"
         const val LESSON_URL = "http://jxglstu.hfut.edu.cn/eams5-student/ws/schedule-table/datum"
-        const val LESSON_FOR_ID = "http://jxglstu.hfut.edu.cn/eams5-student/for-std/course-table/get-data?bizTypeId=23&semesterId=194&dataId=152113"
+        const val LESSON_FOR_ID = "http://jxglstu.hfut.edu.cn/eams5-student/for-std/course-table/get-data?bizTypeId=23&semesterId=214&dataId=152113"
     }
 }

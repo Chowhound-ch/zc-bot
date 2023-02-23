@@ -10,6 +10,8 @@ zsck:
     enable-local: true
     add-music-mapping: /add
     index-url: ${custom.kugou.index-url}
+  config:
+    environment: dev
 
 
 

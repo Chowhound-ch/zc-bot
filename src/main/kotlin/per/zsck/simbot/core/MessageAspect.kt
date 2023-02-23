@@ -1,7 +1,6 @@
 package per.zsck.simbot.core
 
 import kotlinx.coroutines.runBlocking
-import love.forte.simbot.ID
 import love.forte.simbot.event.Event
 import love.forte.simbot.event.GroupMessageEvent
 import org.aspectj.lang.ProceedingJoinPoint
@@ -14,7 +13,9 @@ import per.zsck.simbot.core.config.MiraiBotManagerSupport
 import per.zsck.simbot.core.permit.Permit
 import per.zsck.simbot.core.permit.service.PermitDetailService
 import per.zsck.simbot.core.state.GroupStateCache
-import per.zsck.simbot.core.state.GroupStateEnum
+import per.zsck.simbot.core.state.enums.EnumUtil
+import per.zsck.simbot.core.state.enums.GroupStateEnum
+import per.zsck.simbot.core.state.service.GroupStateService
 
 /**
  * @author zsck
@@ -24,6 +25,7 @@ import per.zsck.simbot.core.state.GroupStateEnum
 @Component
 class MessageAspect(
     val permitDetailService: PermitDetailService,
+    val groupStateService: GroupStateService
     ): MiraiBotManagerSupport() {
 
     // 消息监听，拦截所有带有@RobotListen注解的方法
@@ -43,10 +45,6 @@ class MessageAspect(
         fun proceedFailed(tip: String? = null, group: String) {
             logInfo("执行监听器{}({})(群: {}) 失败 : {}", signature.name, annotation.desc, group, tip ?: "无")
 
-            runBlocking { tip?.let {
-                miraiBot.group(group.ID)?.send(it)
-            } }
-
         }
 
         // 判断是否为群消息
@@ -65,10 +63,26 @@ class MessageAspect(
                 return proceedFailed("权限不足", group.id.toString())
 
             }
+            val groupState = groupStateService.getGroupState(group.id.toString())
             // 判断是否开机
-            if (GroupStateCache.STATE_MAP.getOrDefault(group.id.toString(), GroupStateEnum.CLOSED) < annotation.stateLeast) {
-                return proceedFailed("当前群未开放此功能", group.id.toString())
+            if (groupState.state < annotation.stateLeast){
+
+                return proceedFailed("当前群未开放此功能", group.id.toString()) //未开机则拦截
+
+            }else if (groupState.state != GroupStateEnum.OPENED_ALL){ // 正常开机则进一步判断RobotListen.boolEnumCondition中的条件
+
+                annotation.boolEnumCondition.forEach {
+                    val clazz = Class.forName(it)
+                    val field = GroupStateCache.getByClass(clazz) // 通过反射获取枚举类的字段
+                    field.get(groupState).let { value ->
+                        if (value == EnumUtil.getInstance(clazz, 0)) { // 如果字段值为value为0的枚举则拦截
+                            return proceedFailed("当前群未开放此功能: ${field.type.simpleName}", group.id.toString())
+                        }
+                    }
+                }
+
             }
+            // 完全开机则直接放行
 
             return proceedSuccess(group.id.toString())
         }

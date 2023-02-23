@@ -1,15 +1,16 @@
 package per.zsck.simbot.core.state.service
 
-import cn.hutool.extra.spring.SpringUtil
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.service.IService
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl
-import org.springframework.boot.ApplicationArguments
-import org.springframework.boot.ApplicationRunner
+import org.springframework.cache.annotation.CacheConfig
+import org.springframework.cache.annotation.CachePut
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import per.zsck.simbot.core.state.GroupStateCache
-import per.zsck.simbot.core.state.GroupStateEnum
 import per.zsck.simbot.core.state.entity.GroupState
+import per.zsck.simbot.core.state.enums.EnumUtil
 import per.zsck.simbot.core.state.mapper.GroupStateMapper
 
 /**
@@ -19,57 +20,46 @@ import per.zsck.simbot.core.state.mapper.GroupStateMapper
 interface GroupStateService: IService<GroupState>{
     fun getGroupState(group: String): GroupState
 
-    fun setGroupStateAndCache(group: String, groupStateEnum: GroupStateEnum): Boolean
+    fun setGroupState(groupState: GroupState): GroupState
 
-    fun getGroupListEnableLessonPush(isPush: Int): MutableList<GroupState>
-
-    fun setGroupLessonPush(group: String, isPush: Int): Boolean
+    fun getGroupStateByState(enum: Enum<*>): List<GroupState>
 }
-
+@CacheConfig(cacheNames = ["state"])
 @Service
-class GroupStateServiceImpl: GroupStateService, ServiceImpl<GroupStateMapper, GroupState>(), ApplicationRunner {
-    lateinit var groupStateCache: GroupStateCache
+class GroupStateServiceImpl: GroupStateService, ServiceImpl<GroupStateMapper, GroupState>(){
 
 
-
+    @Cacheable(key = "#group")
     override fun getGroupState(group: String): GroupState {
         return getOne(
             KtQueryWrapper(GroupState::class.java).apply {
                 this.eq(GroupState::groupNumber, group)
             }
-        ) ?: let {
-            GroupState(groupNumber = group).apply { it.save(this) }//没有则保存
+        )
+    }
+
+    /**
+     * true,状态改变, false,状态未改变
+     */
+    @CachePut(key = "#groupState.groupNumber")
+    override fun setGroupState(groupState: GroupState): GroupState {
+        if (getGroupState(groupState.groupNumber!!) == groupState) {
+            return groupState
+        }
+
+        return groupState.apply {
+            saveOrUpdate(this, KtQueryWrapper(GroupState::class.java).eq(GroupState::groupNumber, groupState.groupNumber))
+
         }
     }
 
-    override fun setGroupStateAndCache(group: String, groupStateEnum: GroupStateEnum): Boolean {
-        return if (groupStateCache.setGroupState(group, groupStateEnum)) {
+    override fun getGroupStateByState(enum: Enum<*>): List<GroupState> {
+        EnumUtil.BOOL_ENUM_MAP[enum::class.java]
 
-            saveOrUpdate(GroupState(groupNumber = group, state = groupStateEnum),
-                KtQueryWrapper(GroupState::class.java).eq(GroupState::groupNumber, group))
+        val field = GroupStateCache.getByClass(enum::class.java)
 
-        }else{
-            false
-        }
+
+        return this.list(QueryWrapper<GroupState>().eq(field.name, enum))
     }
 
-    override fun getGroupListEnableLessonPush(isPush: Int): MutableList<GroupState> {
-        return list(KtQueryWrapper(GroupState::class.java).eq(GroupState::lessonPush, isPush))
-    }
-
-    override fun setGroupLessonPush(group: String, isPush: Int): Boolean {
-        return update(getGroupState(group).apply {
-
-                    if (this.lessonPush == isPush){
-                        return false
-                    }
-                    this.lessonPush = isPush
-                },
-            KtQueryWrapper(GroupState::class.java).eq(GroupState::groupNumber, group))
-    }
-
-
-    override fun run(args: ApplicationArguments?) {
-        groupStateCache = SpringUtil.getBean(GroupStateCache::class.java)
-    }
 }

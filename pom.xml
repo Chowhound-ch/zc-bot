@@ -27,6 +27,17 @@
         </dependency>
 
         <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>2.10.9.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
@@ -222,40 +233,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-           <!-- <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <configuration>
-                    <args>
-                        <arg>-Xjsr305=strict</arg>
-                    </args>
-                    <compilerPlugins>
-                        <plugin>spring</plugin>
-                        &lt;!&ndash; 这里!! kotlin官方插件，为被注解的指定类添加无参构造方法 &ndash;&gt;
-                        <plugin>no-arg</plugin>
-                    </compilerPlugins>
-                    <pluginOptions>
-                        &lt;!&ndash; 这里!! 配置你刚刚新建的NoArg注解 &ndash;&gt;
-                        <option>no-arg:annotation=per.zsck.simbot.common.annotation.NoArg</option>
-                        &lt;!&ndash; 在合成的构造函数中调用实例初始化器 &ndash;&gt;
-                        &lt;!&ndash; <option>no-arg:invokeInitializers=true</option> &ndash;&gt;
-                    </pluginOptions>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-maven-allopen</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                    &lt;!&ndash; 这里!! 引入NoArg解决方案 &ndash;&gt;
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-maven-noarg</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>-->
         </plugins>
     </build>
 

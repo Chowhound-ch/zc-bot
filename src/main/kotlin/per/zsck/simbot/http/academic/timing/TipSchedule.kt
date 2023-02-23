@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import love.forte.simbot.ID
 import love.forte.simbot.message.Message
 import love.forte.simbot.message.Text
+import net.mamoe.mirai.Bot
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -13,8 +14,8 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import per.zsck.simbot.common.logInfo
 import per.zsck.simbot.core.config.MiraiBotManagerSupport
-import per.zsck.simbot.core.state.GroupStateConstant
 import per.zsck.simbot.core.state.entity.GroupState
+import per.zsck.simbot.core.state.enums.LessonPushEnum
 import per.zsck.simbot.core.state.service.GroupStateService
 import per.zsck.simbot.http.academic.entity.Schedule
 import per.zsck.simbot.http.academic.service.ScheduleService
@@ -81,11 +82,12 @@ class TipSchedule  (
                     }
                 }
             }
+
             miraiBot.friend(botHost.ID)?.apply {
                 messageList.forEach { send( it ) }
             }
 
-            pushMsgToGroupList(messageList, groupStateService.getGroupListEnableLessonPush(GroupStateConstant.LESSON_PUSH))
+            pushMsgToGroupList(messageList, groupStateService.list())
         }
 
     }
@@ -114,7 +116,7 @@ class TipSchedule  (
                 miraiBot.friend(botHost.ID)?.apply {
                     messageList.forEach { send( it ) }
                 }
-                pushMsgToGroupList(messageList, groupStateService.getGroupListEnableLessonPush(GroupStateConstant.LESSON_PUSH))
+                pushMsgToGroupList(messageList, groupStateService.getGroupStateByState(LessonPushEnum.NORMAL))
             }
 
         }
@@ -122,7 +124,7 @@ class TipSchedule  (
 
     fun pushMsgToGroupList(msgList: List<Message>, groupList: List<GroupState>){
         runBlocking {
-            groupList.forEach { it ->
+            groupList.forEach {
                 it.groupNumber?.let { groupNumber ->
                     miraiBot.group(groupNumber.ID)?.apply { //获取每个开启推送的群
                         msgList.forEach { msg -> send(msg) }//发送推送消息

@@ -13,6 +13,7 @@ import per.zsck.custom.util.jackson.JacksonUtil
 import per.zsck.simbot.common.logError
 import per.zsck.simbot.common.logInfo
 import per.zsck.simbot.common.logWarn
+import per.zsck.simbot.core.config.EnvironmentConfig
 import per.zsck.simbot.http.mihoyo.sign.entity.Award
 import per.zsck.simbot.http.mihoyo.sign.entity.GenshinInfo
 import per.zsck.simbot.http.mihoyo.sign.entity.SignDetail
@@ -38,6 +39,10 @@ class GenShinSign(var genshinInfoService: GenshinInfoService){
 
     @PostConstruct
     fun init(){
+        if (EnvironmentConfig.isDev()){
+            return
+        }
+
         val genshinInfo = genshinInfoService.getGenshinInfo(defaultUid)
 
         if (genshinInfo == null ){

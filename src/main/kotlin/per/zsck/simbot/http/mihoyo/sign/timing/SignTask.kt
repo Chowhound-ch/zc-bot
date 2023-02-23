@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import per.zsck.simbot.core.config.MiraiBotManagerSupport
-import per.zsck.simbot.core.state.GroupStateCache
-import per.zsck.simbot.core.state.GroupStateEnum
+import per.zsck.simbot.core.state.enums.GenshinSignPushEnum
+import per.zsck.simbot.core.state.service.GroupStateService
 import per.zsck.simbot.http.mihoyo.sign.GenShinSign
 import per.zsck.simbot.http.mihoyo.sign.service.GenshinInfoService
 
@@ -23,7 +23,7 @@ import per.zsck.simbot.http.mihoyo.sign.service.GenshinInfoService
 class SignTask (
     val genShinSign: GenShinSign,
     val genshinInfoService: GenshinInfoService,
-    val groupStateCache: GroupStateCache
+    val groupStateService: GroupStateService
         ): MiraiBotManagerSupport(){
 
 
@@ -41,9 +41,9 @@ class SignTask (
                 }
             }
         }
-        groupStateCache.getGroupsWithState(GroupStateEnum.OPENED_ALL).forEach {
+        groupStateService.getGroupStateByState(GenshinSignPushEnum.NORMAL).forEach {
 
-            runBlocking { miraiBot.group( it.ID )?.send(msg.build()) }
+            runBlocking { it.groupNumber?.let { number -> miraiBot.group( number.ID )?.send(msg.build()) } }
 
         }
 
